@@ -3,6 +3,8 @@
 
     <string name="app_name">Site Map</string>
     <string name="hello_world">Hello world!</string>
+    <string name="add_site">Add Site</string>
+    <string name="manage_site">Manage Sites</string>
     <string name="action_settings">Settings</string>
 
 </resources>
