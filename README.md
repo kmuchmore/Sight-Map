@@ -1,2 +1,7 @@
 # Site-Map
-Many jobs require going out to a work sites and taking pictures across the work sites to document progress or problems. The process of keeping track of what pictures are taken at which work site can become tedious when you’re visiting multiple work sites in a single day. The application will overcome this problem by allowing you to geo-fence multiple work sites. Once the work site is geo-fenced the application will automatically separate the photos taken into folders based on which work site they were taken at and name the pictures according to the work site name and the date taken. This program will be written for the Android operating system.
+This is an Android tool that will automatically organize and file images based off of pre-defined Geo-Fenced work sites.
+
+###Features:###
+* Store multiple work sites
+* Geo-Fence work sites
+* Sort images based off of Site name and date
