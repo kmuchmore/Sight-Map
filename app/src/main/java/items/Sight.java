@@ -3,12 +3,14 @@ package items;
 import android.graphics.Bitmap;
 
 import com.google.android.gms.location.Geofence;
+
 import java.util.Date;
 
 /**
  * Created by Kyle on 1/20/2015.
  */
-public class WorkSite {
+public class Sight
+{
 
     private String mSiteName;
     private Geofence mSiteFence;
@@ -16,9 +18,12 @@ public class WorkSite {
     private String mFolderPath;
     private int mNumPics;
 
-    public WorkSite(String mSiteName, Geofence mSiteFence) {
+    public Sight(String mSiteName, Geofence mSiteFence)
+    {
         this.mSiteName = mSiteName;
         this.mSiteFence = mSiteFence;
+        this.mLastUpdated = new Date();
+        this.mNumPics = 0;
     }
 
     public void addPic(Bitmap image)
@@ -29,35 +34,49 @@ public class WorkSite {
         mLastUpdated = new Date();
     }
 
-    public String getmSiteName() {
+    @Override
+    public String toString()
+    {
         return mSiteName;
     }
 
-    public void setmSiteName(String mSiteName) {
+    public String getmSiteName()
+    {
+        return mSiteName;
+    }
+
+    public void setmSiteName(String mSiteName)
+    {
         this.mSiteName = mSiteName;
     }
 
-    public Geofence getmSiteFence() {
+    public Geofence getmSiteFence()
+    {
         return mSiteFence;
     }
 
-    public void setmSiteFence(Geofence mSiteFence) {
+    public void setmSiteFence(Geofence mSiteFence)
+    {
         this.mSiteFence = mSiteFence;
     }
 
-    public Date getmLastUpdated() {
+    public Date getmLastUpdated()
+    {
         return mLastUpdated;
     }
 
-    public String getmFolderPath() {
+    public String getmFolderPath()
+    {
         return mFolderPath;
     }
 
-    public void setmFolderPath(String mFolderPath) {
+    public void setmFolderPath(String mFolderPath)
+    {
         this.mFolderPath = mFolderPath;
     }
 
-    public int getmNumPics() {
+    public int getmNumPics()
+    {
         return mNumPics;
     }
 }
