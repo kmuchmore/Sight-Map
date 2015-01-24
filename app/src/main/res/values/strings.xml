@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">Site Map</string>
+    <string name="app_name">Sight Map</string>
     <string name="hello_world">Hello world!</string>
     <string name="add_site">Add Site</string>
-    <string name="manage_site">Manage Sites</string>
+    <string name="camera">Camera</string>
+    <string name="manage_site">Manage</string>
     <string name="action_settings">Settings</string>
 
 </resources>

@@ -7,15 +7,13 @@
 
     <ListView
         android:layout_width="match_parent"
-        android:layout_height="254dp"
-        android:id="@+id/listView2"
-        android:layout_gravity="center_horizontal"
-        android:layout_weight="0.77" />
+        android:layout_height="389dp"
+        android:id="@+id/sightList2"
+        android:layout_weight="0.93" />
 
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Add Site"
-        android:id="@+id/button" />
-
+        android:text="Add Sight"
+        android:id="@+id/addSightBtn" />
 </LinearLayout>
