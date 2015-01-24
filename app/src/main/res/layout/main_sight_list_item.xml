@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android = "http://schemas.android.com/apk/res/android"
+                android:layout_width = "match_parent"
+                android:layout_height = "match_parent">
+
+    <TextView
+        android:id = "@+id/sight_title"
+        android:layout_width = "wrap_content"
+        android:layout_height = "wrap_content"
+        android:paddingLeft = "8dp"
+        android:textSize = "18sp"
+        android:textStyle = "bold"
+        android:text="SiteName"
+        android:layout_centerVertical = "false"
+        android:layout_alignParentStart = "true" />
+
+    <TextView
+        android:id = "@+id/date_updated"
+        android:layout_width = "wrap_content"
+        android:layout_height = "wrap_content"
+        android:text = "Updated: 01-01-2015"
+        android:layout_alignBottom = "@+id/sight_title"
+        android:layout_toStartOf = "@+id/view_collections" />
+
+    <TextView
+        android:id = "@+id/textView2"
+        android:layout_width = "wrap_content"
+        android:layout_height = "wrap_content"
+        android:text = "1337 photos"
+        android:paddingLeft="10sp"
+        android:layout_below = "@+id/sight_title"
+        android:layout_alignParentLeft = "@+id/sight_title"
+        />
+
+    <ImageButton
+        android:id = "@+id/view_collections"
+        android:layout_width = "wrap_content"
+        android:layout_height = "wrap_content"
+        android:src="@drawable/ic_action_picture"
+        android:layout_alignTop = "@+id/sight_title"
+        android:layout_alignParentEnd = "true" />
+
+</RelativeLayout>
