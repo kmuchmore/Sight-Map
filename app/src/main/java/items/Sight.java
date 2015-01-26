@@ -9,25 +9,27 @@ import java.util.Date;
 /**
  * Created by Kyle on 1/20/2015.
  */
-public class Sight
-{
-
+public class Sight {
+    private int id;
     private String mSiteName;
     private Geofence mSiteFence;
     private Date mLastUpdated;
     private String mFolderPath;
     private int mNumPics;
 
-    public Sight(String mSiteName, Geofence mSiteFence)
-    {
+    public Sight(int id, String mSiteName, Geofence mSiteFence) {
+        this.id = id;
         this.mSiteName = mSiteName;
         this.mSiteFence = mSiteFence;
         this.mLastUpdated = new Date();
         this.mNumPics = 0;
     }
 
-    public void addPic(Bitmap image)
-    {
+    public int getId() {
+        return id;
+    }
+
+    public void addPic(Bitmap image) {
         /* @TODO Figure out how to save image to card */
 
         mNumPics++;
@@ -35,48 +37,39 @@ public class Sight
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         return mSiteName;
     }
 
-    public String getmSiteName()
-    {
+    public String getmSiteName() {
         return mSiteName;
     }
 
-    public void setmSiteName(String mSiteName)
-    {
+    public void setmSiteName(String mSiteName) {
         this.mSiteName = mSiteName;
     }
 
-    public Geofence getmSiteFence()
-    {
+    public Geofence getmSiteFence() {
         return mSiteFence;
     }
 
-    public void setmSiteFence(Geofence mSiteFence)
-    {
+    public void setmSiteFence(Geofence mSiteFence) {
         this.mSiteFence = mSiteFence;
     }
 
-    public Date getmLastUpdated()
-    {
+    public Date getmLastUpdated() {
         return mLastUpdated;
     }
 
-    public String getmFolderPath()
-    {
+    public String getmFolderPath() {
         return mFolderPath;
     }
 
-    public void setmFolderPath(String mFolderPath)
-    {
+    public void setmFolderPath(String mFolderPath) {
         this.mFolderPath = mFolderPath;
     }
 
-    public int getmNumPics()
-    {
+    public int getmNumPics() {
         return mNumPics;
     }
 }

@@ -1,10 +1,14 @@
 package com.kwmuch.kyle.sitemap;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 import android.widget.ListView;
+import android.widget.Button;
 
 import com.google.android.gms.location.Geofence;
 
@@ -32,7 +36,7 @@ public class ManageActivity extends Activity
         ListView sightListView = (ListView) findViewById(R.id.sightList2);
         sightListView.setAdapter(adapter);
 
-        adapter.add(new Sight("Test", new Geofence()
+        adapter.add(new Sight(1, "Test", new Geofence()
         {
             @Override
             public String getRequestId()
@@ -56,4 +60,12 @@ public class ManageActivity extends Activity
 
         return super.onOptionsItemSelected(item);
     }
+
+
+
+    public void newSight(View v)
+    {
+        startActivity(new Intent(ManageActivity.this, NewSightActivity.class));
+    }
+
 }

@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.ListView;
 
 import com.google.android.gms.location.Geofence;
@@ -35,7 +34,7 @@ public class MainActivity extends Activity
         ListView sightListView = (ListView) findViewById(R.id.sightList);
         sightListView.setAdapter(adapter);
 
-        adapter.add(new Sight("Test Worksite", new Geofence()
+        adapter.add(new Sight(1, "Test Worksite", new Geofence()
         {
             @Override
             public String getRequestId()
@@ -44,7 +43,7 @@ public class MainActivity extends Activity
             }
         }));
 
-        adapter.add(new Sight("Test Worksite2", new Geofence()
+        adapter.add(new Sight(2, "Test Worksite2", new Geofence()
         {
             @Override
             public String getRequestId()
