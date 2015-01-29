@@ -32,6 +32,7 @@
         android:layout_height="wrap_content"
         android:text="@string/add_geofence"
         android:id="@+id/addGeoFence"
+        android:layout_below="@+id/gMap"
         android:layout_alignParentStart="true"
         android:layout_alignParentBottom="true" />
 
