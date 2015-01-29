@@ -1,13 +1,56 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="360dp"
+    android:layout_height="wrap_content"
     android:orientation="vertical"
     android:id="@+id/newSightC">
 
-    <!--<fragment xmlns:android="http://schemas.android.com/apk/res/android"-->
-        <!--android:name="com.google.android.gms.maps.MapFragment"-->
-        <!--android:id="@+id/mapy"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="match_parent"/>-->
-</LinearLayout>
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/sightName"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:text="Sight Name"
+        android:textSize="24dp" />
+
+    <fragment
+        android:layout_width="wrap_content"
+        android:layout_height="420dp"
+        android:name="com.google.android.gms.maps.MapFragment"
+        android:id="@+id/gMap"
+        android:layout_below="@+id/sightName"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        tools:layout="@layout/activity_new_sight" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/add_geofence"
+        android:id="@+id/addGeoFence"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentBottom="true" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/clear"
+        android:id="@+id/geoClear"
+        android:layout_below="@+id/gMap"
+        android:layout_toEndOf="@+id/addGeoFence"
+        android:layout_alignParentBottom="true" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/save"
+        android:id="@+id/sightSave"
+        android:layout_alignTop="@+id/geoClear"
+        android:layout_alignBottom="@+id/geoClear"
+        android:layout_alignParentEnd="true"
+        android:layout_toEndOf="@+id/geoClear" />
+</RelativeLayout>

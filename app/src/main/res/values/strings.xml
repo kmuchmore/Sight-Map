@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name = "app_name">Sight Map</string>
-    <string name = "hello_world">Hello world!</string>
-    <string name = "add_site">Add Site</string>
-    <string name = "camera">Camera</string>
-    <string name = "manage_site">Manage</string>
-    <string name = "action_settings">Settings</string>
+    <string name="app_name">Sight Map</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="add_site">Add Site</string>
+    <string name="camera">Camera</string>
+    <string name="manage_site">Manage</string>
+    <string name="action_settings">Settings</string>
+    <string name="clear">Clear</string>
+    <string name="add_geofence">Add GeoFence</string>
+    <string name="save">Save</string>
 
 </resources>
