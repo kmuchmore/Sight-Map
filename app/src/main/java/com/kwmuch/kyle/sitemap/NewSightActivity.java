@@ -1,25 +1,34 @@
 package com.kwmuch.kyle.sitemap;
 
+import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
-
-import static com.google.android.gms.maps.GoogleMap.CancelableCallback;
 
 /**
  * Created by Kyle on 1/26/2015.
  */
-public class NewSightActivity extends FragmentActivity implements OnMapReadyCallback {
+public class NewSightActivity extends FragmentActivity implements
+        GoogleApiClient.ConnectionCallbacks,
+        GoogleApiClient.OnConnectionFailedListener,
+        OnMapReadyCallback,
+        LocationListener {
 
-    MapFragment mMapFragment;
-    static GoogleMap mMap = null;
+    private MapFragment mMapFragment = null;
+    private GoogleMap mMap = null;
+    private Location lastLocation = null;
+    public GoogleApiClient mGoogleApiClient = null;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -28,56 +37,51 @@ public class NewSightActivity extends FragmentActivity implements OnMapReadyCall
 
         mMapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.gMap);
         mMapFragment.getMapAsync(this);
+
+        buildGoogleApiClient();
     }
 
     @Override
-    public void onMapReady(GoogleMap map) {
-        if(mMap == null)
-        {
-            mMap = map;
-        }
-        mMap.addMarker(new MarkerOptions()
-                .position(new LatLng(0, 0))
-                .title("Marker"));
-
-        initCamera();
-        toggleView();
+    public void onMapReady(GoogleMap googleMap) {
+        mMap = googleMap;
     }
 
-    public void initCamera() {
-        CameraPosition INIT = new CameraPosition.Builder()
-                .target(new LatLng(41.7378, -111.8308))
+    protected synchronized void buildGoogleApiClient() {
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(LocationServices.API)
+                .build();
+        mGoogleApiClient.connect();
+    }
+
+    @Override
+    public void onConnected(Bundle bundle) {
+        lastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+        if(lastLocation != null)
+        {
+            CameraPosition update = new CameraPosition.Builder()
+                .target(new LatLng(lastLocation.getLatitude(), lastLocation.getLongitude()))
                 .zoom( 17.5F )
                 .bearing( 300F) // orientation
                 .tilt( 50F) // viewing angle
                 .build();
-
-        mMap.animateCamera(CameraUpdateFactory.newCameraPosition(INIT));
-    }
-
-    /**
-     * Toggle View Satellite-Normal
-     */
-    public static void toggleView(){
-        mMap.setMapType( mMap.getMapType() ==
-                GoogleMap.MAP_TYPE_NORMAL ?
-                GoogleMap.MAP_TYPE_SATELLITE :
-                GoogleMap.MAP_TYPE_NORMAL);
-    }
-
-    private static CancelableCallback callback = new CancelableCallback() {
-        @Override
-        public void onFinish() {
-            scroll();
+            mMap.animateCamera(CameraUpdateFactory.newCameraPosition(update));
         }
-        @Override
-        public void onCancel() {}
-    };
+    }
 
-    public static void scroll() {
-        // we don't want to scroll too fast since
-        // loading new areas in map takes time
-        mMap.animateCamera( CameraUpdateFactory.scrollBy(10, -10),
-                callback ); // 10 pix
+    @Override
+    public void onConnectionSuspended(int i) {
+
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+
     }
 }
