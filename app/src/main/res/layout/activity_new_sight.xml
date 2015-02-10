@@ -19,39 +19,38 @@
 
     <fragment
         android:layout_width="wrap_content"
-        android:layout_height="420dp"
+        android:layout_height="wrap_content"
         android:name="com.google.android.gms.maps.MapFragment"
         android:id="@+id/gMap"
-        android:layout_below="@+id/sightName"
+        android:layout_alignEnd="@id/sightName"
         android:layout_alignParentStart="true"
-        android:layout_alignParentEnd="true"
-        tools:layout="@layout/activity_new_sight" />
+        android:layout_below="@id/sightName"
+        android:layout_alignParentEnd="false"
+        android:layout_alignParentBottom="true" />
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/add_geofence"
         android:id="@+id/addGeoFence"
-        android:layout_below="@+id/gMap"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentBottom="true" />
+        android:layout_alignParentBottom="true"
+        android:layout_toStartOf="@+id/geoClear"
+        android:alpha="25" />
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/clear"
         android:id="@+id/geoClear"
-        android:layout_below="@+id/gMap"
-        android:layout_toEndOf="@+id/addGeoFence"
-        android:layout_alignParentBottom="true" />
+        android:layout_alignParentBottom="true"
+        android:layout_toStartOf="@+id/sightSave" />
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/save"
         android:id="@+id/sightSave"
-        android:layout_alignTop="@+id/geoClear"
-        android:layout_alignBottom="@+id/geoClear"
-        android:layout_alignParentEnd="true"
-        android:layout_toEndOf="@+id/geoClear" />
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true" />
+
 </RelativeLayout>
