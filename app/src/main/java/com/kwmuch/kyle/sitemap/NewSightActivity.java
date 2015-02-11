@@ -62,9 +62,9 @@ public class NewSightActivity extends FragmentActivity implements
         {
             CameraPosition update = new CameraPosition.Builder()
                 .target(new LatLng(lastLocation.getLatitude(), lastLocation.getLongitude()))
-                .zoom( 17.5F )
-                .bearing( 300F) // orientation
-                .tilt( 50F) // viewing angle
+                .zoom( 50.0F )
+//                .bearing( 300F) // orientation
+//                .tilt( 50F) // viewing angle
                 .build();
             mMap.animateCamera(CameraUpdateFactory.newCameraPosition(update));
         }
