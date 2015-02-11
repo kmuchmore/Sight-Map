@@ -34,8 +34,7 @@
         android:text="@string/add_geofence"
         android:id="@+id/addGeoFence"
         android:layout_alignParentBottom="true"
-        android:layout_toStartOf="@+id/geoClear"
-        android:alpha="25" />
+        android:layout_toStartOf="@+id/geoClear"/>
 
     <Button
         android:layout_width="wrap_content"

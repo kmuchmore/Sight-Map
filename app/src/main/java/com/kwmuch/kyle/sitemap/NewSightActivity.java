@@ -1,5 +1,6 @@
 package com.kwmuch.kyle.sitemap;
 
+import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
@@ -18,6 +19,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.PolygonOptions;
 
 import java.util.Vector;
 
@@ -39,9 +41,10 @@ public class NewSightActivity extends FragmentActivity implements
     public GoogleApiClient mGoogleApiClient = null;
     private LocationRequest mLocReq = null;
     private EditText mSightName = null;
-    private Vector<MarkerOptions> fencePoints = new Vector<>();
     boolean mIsReqLocUpdates = false;
     Sight mSight = null;
+    private Vector<LatLng> geoFencePolygonPoints = null;
+
     //@TODO Pass in Sight and have it return that... not sure how
 
     @Override
@@ -53,6 +56,7 @@ public class NewSightActivity extends FragmentActivity implements
         mMapFragment.getMapAsync(this);
 
         mSightName = (EditText) findViewById(R.id.sightName);
+        geoFencePolygonPoints = new Vector<LatLng>();
 
         buildGoogleApiClient();
         createLocationRequest();
@@ -114,7 +118,7 @@ public class NewSightActivity extends FragmentActivity implements
 
     @Override
     public void onLocationChanged(Location location) {
-        Log.w("Location", "Location Updating");
+        Log.w("Locations", "Location Updating");
         mCurrentLocation = location;
         updateMapLocation();
 //        mLastUpdateTime = DateFormat.getTimeInstance().format(new Date());
@@ -159,9 +163,40 @@ public class NewSightActivity extends FragmentActivity implements
 
         String sightName = mSightName.getText().toString();
 
-        fencePoints.add(new MarkerOptions()
-            .position(latLng)
-            .title("Fence: " + sightName)
+        geoFencePolygonPoints.add(latLng);
+        Log.w("Locations", "Added GeoPoint to Vector\n");
+
+        mMap.clear();
+        drawPointsGeoFence();
+
+        if(geoFencePolygonPoints.size() >= 3)
+        {
+            drawPolygonGeoFence();
+        }
+    }
+
+    private void drawPointsGeoFence() {
+        Log.w("Locations", "Adding Points");
+        for(LatLng point:geoFencePolygonPoints) {
+            mMap.addMarker(new MarkerOptions()
+                            .position(point)
+            );
+        }
+    }
+
+    private void drawPolygonGeoFence() {
+        Log.w("Locations", "Drawing polygon");
+        mMap.addPolygon(new PolygonOptions()
+            .addAll(geoFencePolygonPoints)
+            .fillColor(0x40ff0000)
+            .strokeColor(Color.TRANSPARENT)
+            .strokeWidth(2)
         );
+    }
+
+    public void clearMap() {
+        Log.w("Locations", "Clearing Map");
+        mMap.clear();
+        geoFencePolygonPoints.clear();
     }
 }
