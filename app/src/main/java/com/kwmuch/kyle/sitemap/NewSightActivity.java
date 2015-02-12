@@ -1,10 +1,19 @@
 package com.kwmuch.kyle.sitemap;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.graphics.Color;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.text.InputType;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -21,6 +30,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolygonOptions;
 
+import java.util.Locale;
 import java.util.Vector;
 
 import items.Sight;
@@ -32,16 +42,25 @@ public class NewSightActivity extends FragmentActivity implements
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
         LocationListener,
-        GoogleMap.OnMapLongClickListener,
+//        GoogleMap.OnMapLongClickListener,
+        GoogleMap.OnMapClickListener,
         OnMapReadyCallback{
 
+    //Map Variables
     private MapFragment mMapFragment = null;
     private GoogleMap mMap = null;
-    private Location mCurrentLocation = null;
     public GoogleApiClient mGoogleApiClient = null;
+
+    //Location variables
+    private Location mCurrentLocation = null;
     private LocationRequest mLocReq = null;
-    private EditText mSightName = null;
     boolean mIsReqLocUpdates = false;
+    boolean addPoints = false;
+    private String m_Text = "";
+
+    //UI variables
+    private EditText mSightName = null;
+    private Button mAddGeoFenceButton = null;
     Sight mSight = null;
     private Vector<LatLng> geoFencePolygonPoints = null;
 
@@ -56,6 +75,7 @@ public class NewSightActivity extends FragmentActivity implements
         mMapFragment.getMapAsync(this);
 
         mSightName = (EditText) findViewById(R.id.sightName);
+        mAddGeoFenceButton = (Button) findViewById(R.id.addGeoFence);
         geoFencePolygonPoints = new Vector<LatLng>();
 
         buildGoogleApiClient();
@@ -63,9 +83,34 @@ public class NewSightActivity extends FragmentActivity implements
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu)
+    {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_newsight, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        switch (id) {
+            case R.id.goto_location:
+                return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        mMap.setOnMapLongClickListener(this);
+//        mMap.setOnMapLongClickListener(this);
+        mMap.setOnMapClickListener(this);
         mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
     }
 
@@ -123,6 +168,7 @@ public class NewSightActivity extends FragmentActivity implements
         updateMapLocation();
 //        mLastUpdateTime = DateFormat.getTimeInstance().format(new Date());
 //        updateUI();
+        stopLocationUpdates();
     }
 
     @Override
@@ -158,22 +204,22 @@ public class NewSightActivity extends FragmentActivity implements
         mMap.animateCamera(CameraUpdateFactory.newCameraPosition(update));
     }
 
-    @Override
-    public void onMapLongClick(LatLng latLng) {
-
-        String sightName = mSightName.getText().toString();
-
-        geoFencePolygonPoints.add(latLng);
-        Log.w("Locations", "Added GeoPoint to Vector\n");
-
-        mMap.clear();
-        drawPointsGeoFence();
-
-        if(geoFencePolygonPoints.size() >= 3)
-        {
-            drawPolygonGeoFence();
-        }
-    }
+//    @Override
+//    public void onMapLongClick(LatLng latLng) {
+//
+//        String sightName = mSightName.getText().toString();
+//
+//        geoFencePolygonPoints.add(latLng);
+//        Log.w("Locations", "Added GeoPoint to Vector\n");
+//
+//        mMap.clear();
+//        drawPointsGeoFence();
+//
+//        if(geoFencePolygonPoints.size() >= 3)
+//        {
+//            drawPolygonGeoFence();
+//        }
+//    }
 
     private void drawPointsGeoFence() {
         Log.w("Locations", "Adding Points");
@@ -182,6 +228,44 @@ public class NewSightActivity extends FragmentActivity implements
                             .position(point)
             );
         }
+    }
+
+    private void gotoAddress(View view) {
+        getAddress();
+        if(!m_Text.isEmpty())
+        {
+            Geocoder gc = new Geocoder(this);
+            Address loc = new Address(Locale.ENGLISH);
+//            loc.setAddressLine();
+        }
+    }
+
+    private void getAddress() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Title");
+
+// Set up the input
+        final EditText input = new EditText(this);
+// Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
+        input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+        builder.setView(input);
+
+// Set up the buttons
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                m_Text = input.getText().toString();
+            }
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                m_Text = "";
+                dialog.cancel();
+            }
+        });
+
+        builder.show();
     }
 
     private void drawPolygonGeoFence() {
@@ -194,9 +278,32 @@ public class NewSightActivity extends FragmentActivity implements
         );
     }
 
-    public void clearMap() {
+    public void clearMap(View view) {
         Log.w("Locations", "Clearing Map");
         mMap.clear();
         geoFencePolygonPoints.clear();
+    }
+
+    public void toggleAddGeoPoints(View view) {
+        addPoints = !addPoints;
+    }
+
+    @Override
+    public void onMapClick(LatLng latLng) {
+        if(addPoints)
+        {
+            String sightName = mSightName.getText().toString();
+
+            geoFencePolygonPoints.add(latLng);
+            Log.w("Locations", "Added GeoPoint to Vector\n");
+
+            mMap.clear();
+            drawPointsGeoFence();
+
+            if(geoFencePolygonPoints.size() >= 3)
+            {
+                drawPolygonGeoFence();
+            }
+        }
     }
 }

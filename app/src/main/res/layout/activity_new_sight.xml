@@ -4,7 +4,8 @@
     android:layout_width="360dp"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:id="@+id/newSightC">
+    android:id="@+id/newSightC"
+    tools:context = ".NewSightActivity">
 
 
     <EditText
@@ -28,13 +29,17 @@
         android:layout_alignParentEnd="false"
         android:layout_alignParentBottom="true" />
 
-    <Button
+    <ToggleButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/add_geofence"
         android:id="@+id/addGeoFence"
+        android:textOn="@string/addGeoOn"
+        android:textOff="@string/addGeoOff"
         android:layout_alignParentBottom="true"
-        android:layout_toStartOf="@+id/geoClear"/>
+        android:layout_toStartOf="@+id/geoClear"
+        android:onClick="toggleAddGeoPoints"
+        android:alpha="0.85" />
 
     <Button
         android:layout_width="wrap_content"
@@ -42,7 +47,9 @@
         android:text="@string/clear"
         android:id="@+id/geoClear"
         android:layout_alignParentBottom="true"
-        android:layout_toStartOf="@+id/sightSave" />
+        android:layout_toStartOf="@+id/sightSave"
+        android:onClick="clearMap"
+        android:alpha="0.85" />
 
     <Button
         android:layout_width="wrap_content"
@@ -50,6 +57,7 @@
         android:text="@string/save"
         android:id="@+id/sightSave"
         android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true" />
+        android:layout_alignParentEnd="true"
+        android:alpha="0.85" />
 
 </RelativeLayout>
