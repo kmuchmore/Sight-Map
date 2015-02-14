@@ -1,6 +1,8 @@
 package items;
 
 import android.graphics.Bitmap;
+import android.os.Parcel;
+import android.os.Parcelable;
 
 import com.google.android.gms.location.Geofence;
 
@@ -9,7 +11,7 @@ import java.util.Date;
 /**
  * Created by Kyle on 1/20/2015.
  */
-public class Sight {
+public class Sight implements Parcelable{
     private int id;
     private String mSiteName;
     private Geofence mSiteFence;
@@ -23,6 +25,15 @@ public class Sight {
         this.mSiteFence = mSiteFence;
         this.mLastUpdated = new Date();
         this.mNumPics = 0;
+    }
+
+    public Sight(Parcel in) {
+        this.id = in.readInt();
+        this.mSiteName = in.readString();
+        this.mSiteFence = (Geofence)in.readValue(Geofence.class.getClassLoader());
+        this.mLastUpdated = (Date)in.readValue(Date.class.getClassLoader());
+        this.mFolderPath = in.readString();
+        this.mNumPics = in.readInt();
     }
 
     public int getId() {
@@ -71,5 +82,20 @@ public class Sight {
 
     public int getmNumPics() {
         return mNumPics;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(id);
+        dest.writeString(mSiteName);
+        dest.writeValue(mSiteFence);
+        dest.writeValue(mLastUpdated);
+        dest.writeString(mFolderPath);
+        dest.writeInt(mNumPics);
     }
 }

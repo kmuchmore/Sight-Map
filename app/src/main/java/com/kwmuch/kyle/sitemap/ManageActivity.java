@@ -9,6 +9,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.google.android.gms.location.Geofence;
 
@@ -65,7 +66,17 @@ public class ManageActivity extends Activity
 
     public void newSight(View v)
     {
-        startActivity(new Intent(ManageActivity.this, NewSightActivity.class));
+        Intent ns = new Intent(ManageActivity.this, NewSightActivity.class);
+//        startActivityForResult(ns);
     }
 
+//    @Override
+//    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+//        if (resultCode == RESULT_OK && requestCode == REQUEST_CODE) {
+//            if (data.hasExtra("myData1")) {
+//                Toast.makeText(this, data.getExtras().getString("myData1"),
+//                        Toast.LENGTH_SHORT).show();
+//            }
+//        }
+//    }
 }

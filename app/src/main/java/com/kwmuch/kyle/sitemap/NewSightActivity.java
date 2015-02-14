@@ -30,6 +30,8 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolygonOptions;
 
+import java.io.IOException;
+import java.util.List;
 import java.util.Locale;
 import java.util.Vector;
 
@@ -100,6 +102,7 @@ public class NewSightActivity extends FragmentActivity implements
 
         switch (id) {
             case R.id.goto_location:
+                getAddress();
                 return true;
         }
 
@@ -230,24 +233,32 @@ public class NewSightActivity extends FragmentActivity implements
         }
     }
 
-    private void gotoAddress(View view) {
-        getAddress();
+    private void gotoAddress() {
+        Log.w("Locations", "Got here");
         if(!m_Text.isEmpty())
         {
             Geocoder gc = new Geocoder(this);
-            Address loc = new Address(Locale.ENGLISH);
-//            loc.setAddressLine();
+            List<Address> loc = null;
+            try {
+                loc = gc.getFromLocationName(m_Text, 1);
+                mCurrentLocation.setLatitude(loc.get(0).getLatitude());
+                mCurrentLocation.setLongitude(loc.get(0).getLongitude());
+                updateMapLocation();
+            } catch (IOException e) {
+                Log.w("Locations", "No Location");
+                e.printStackTrace();
+            }
         }
     }
 
     private void getAddress() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Title");
+        builder.setTitle("Enter Address");
 
 // Set up the input
         final EditText input = new EditText(this);
 // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
-        input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+        input.setInputType(InputType.TYPE_CLASS_TEXT);
         builder.setView(input);
 
 // Set up the buttons
@@ -255,6 +266,7 @@ public class NewSightActivity extends FragmentActivity implements
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 m_Text = input.getText().toString();
+                gotoAddress();
             }
         });
         builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
