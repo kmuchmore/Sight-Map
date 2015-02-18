@@ -23,6 +23,8 @@ import utils.SightArrayAdapter;
  */
 public class ManageActivity extends Activity
 {
+    static final int NEW_SIGHT_REQUEST = 1;
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -67,16 +69,16 @@ public class ManageActivity extends Activity
     public void newSight(View v)
     {
         Intent ns = new Intent(ManageActivity.this, NewSightActivity.class);
-//        startActivityForResult(ns);
+        startActivity(ns);
     }
 
-//    @Override
-//    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-//        if (resultCode == RESULT_OK && requestCode == REQUEST_CODE) {
-//            if (data.hasExtra("myData1")) {
-//                Toast.makeText(this, data.getExtras().getString("myData1"),
-//                        Toast.LENGTH_SHORT).show();
-//            }
-//        }
-//    }
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == RESULT_OK && requestCode == NEW_SIGHT_REQUEST) {
+            if (data.hasExtra("retSight")) {
+                Bundle extras = data.getExtras();
+                Sight newSight = (Sight) extras.get("retSight");
+            }
+        }
+    }
 }
