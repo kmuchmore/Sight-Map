@@ -58,6 +58,8 @@
         android:id="@+id/sightSave"
         android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"
-        android:alpha="0.85" />
+        android:alpha="0.85"
+        android:nestedScrollingEnabled="true"
+        android:onClick="saveSight"/>
 
 </RelativeLayout>

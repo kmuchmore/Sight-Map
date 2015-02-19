@@ -164,6 +164,11 @@ public class NewSightActivity extends FragmentActivity implements
 
     }
 
+    public void saveSight(View view)
+    {
+
+    }
+
     @Override
     public void onLocationChanged(Location location) {
         Log.w("Locations", "Location Updating");
