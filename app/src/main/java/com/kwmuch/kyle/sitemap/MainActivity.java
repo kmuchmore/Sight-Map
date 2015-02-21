@@ -35,8 +35,8 @@ public class MainActivity extends Activity
         ListView sightListView = (ListView) findViewById(R.id.sightList);
         sightListView.setAdapter(adapter);
 
-        adapter.add(new Sight(1, "Test Worksite"));
-        adapter.add(new Sight(2, "Test Worksite2"));
+        adapter.add(new Sight());
+        adapter.add(new Sight());
     }
 
     @Override

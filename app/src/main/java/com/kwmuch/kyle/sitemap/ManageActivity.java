@@ -24,6 +24,7 @@ import utils.SightArrayAdapter;
 public class ManageActivity extends Activity
 {
     public static final int NEW_SIGHT_REQUEST = 1;
+    public static final String PAR_KEY = "com.kwmuch.kyle.sightmap.spar";
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -39,13 +40,12 @@ public class ManageActivity extends Activity
         ListView sightListView = (ListView) findViewById(R.id.sightList2);
         sightListView.setAdapter(adapter);
 
-        adapter.add(new Sight(1, "Test"));
+        adapter.add(new Sight());
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item)
     {
-
         switch (item.getItemId()) {
             // Respond to the action bar's Up/Home button
             case android.R.id.home:
@@ -58,8 +58,23 @@ public class ManageActivity extends Activity
 
     public void newSight(View v)
     {
+        Sight sendSight = new Sight();
         Intent ns = new Intent(ManageActivity.this, NewSightActivity.class);
+        Bundle sendBundle = new Bundle();
+        sendBundle.putParcelable(PAR_KEY, sendSight);
+        ns.putExtras(sendBundle);
+
         startActivityForResult(ns, NEW_SIGHT_REQUEST);
+
+        Person mPerson = new Person();
+        mPerson.setName("Leon");
+        mPerson.setAge(25);
+        Intent mIntent = new Intent(this,ObjectTranDemo1.class);
+        Bundle mBundle = new Bundle();
+        mBundle.putSerializable(SER_KEY,mPerson);
+        mIntent.putExtras(mBundle);
+        startActivity(mIntent);
+
     }
 
     @Override

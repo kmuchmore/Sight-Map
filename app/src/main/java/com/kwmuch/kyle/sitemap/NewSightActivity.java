@@ -66,6 +66,7 @@ public class NewSightActivity extends FragmentActivity implements
     private EditText mSightName = null;
     private Button mAddGeoFenceButton = null;
     private Vector<LatLng> geoFencePolygonPoints = null;
+    private Sight mCurrentSight = null;
 
     //@TODO Pass in Sight and have it return that... not sure how
 
@@ -73,6 +74,8 @@ public class NewSightActivity extends FragmentActivity implements
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_sight);
+
+        mCurrentSight = (Sight)getIntent().getParcelableExtra(ManageActivity.PAR_KEY);
 
         mMapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.gMap);
         mMapFragment.getMapAsync(this);
