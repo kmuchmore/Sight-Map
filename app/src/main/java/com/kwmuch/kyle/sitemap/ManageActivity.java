@@ -23,7 +23,7 @@ import utils.SightArrayAdapter;
  */
 public class ManageActivity extends Activity
 {
-    static final int NEW_SIGHT_REQUEST = 1;
+    public static final int NEW_SIGHT_REQUEST = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -39,15 +39,7 @@ public class ManageActivity extends Activity
         ListView sightListView = (ListView) findViewById(R.id.sightList2);
         sightListView.setAdapter(adapter);
 
-        adapter.add(new Sight(1, "Test", new Geofence()
-        {
-            @Override
-            public String getRequestId()
-            {
-                return null;
-            }
-        }));
-
+        adapter.add(new Sight(1, "Test"));
     }
 
     @Override
@@ -64,20 +56,17 @@ public class ManageActivity extends Activity
         return super.onOptionsItemSelected(item);
     }
 
-
-
     public void newSight(View v)
     {
         Intent ns = new Intent(ManageActivity.this, NewSightActivity.class);
-        startActivity(ns);
+        startActivityForResult(ns, NEW_SIGHT_REQUEST);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == RESULT_OK && requestCode == NEW_SIGHT_REQUEST) {
             if (data.hasExtra("retSight")) {
-                Bundle extras = data.getExtras();
-                Sight newSight = (Sight) extras.get("retSight");
+                Sight newSight = data.getExtras().getParcelable("retSight");
             }
         }
     }

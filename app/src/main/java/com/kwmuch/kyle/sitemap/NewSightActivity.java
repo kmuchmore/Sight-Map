@@ -2,11 +2,13 @@ package com.kwmuch.kyle.sitemap;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Color;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
+import android.os.Parcel;
 import android.support.v4.app.FragmentActivity;
 import android.text.InputType;
 import android.util.Log;
@@ -63,7 +65,6 @@ public class NewSightActivity extends FragmentActivity implements
     //UI variables
     private EditText mSightName = null;
     private Button mAddGeoFenceButton = null;
-    Sight mSight = null;
     private Vector<LatLng> geoFencePolygonPoints = null;
 
     //@TODO Pass in Sight and have it return that... not sure how
@@ -166,7 +167,14 @@ public class NewSightActivity extends FragmentActivity implements
 
     public void saveSight(View view)
     {
-
+        int resultCode = ManageActivity.NEW_SIGHT_REQUEST;
+        Sight retSight = new Sight(MainActivity.getNewID(), m_Text);
+        Parcel retParcel;
+        retSight.writeToParcel(retParcel, );
+        Intent retI = new Intent();
+        retI.putExtra("retSight", retSight);
+        setResult(RESULT_OK, retI);
+        finish();
     }
 
     @Override

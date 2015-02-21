@@ -21,6 +21,7 @@ public class MainActivity extends Activity
 {
 
     static final int REQUEST_IMAGE_CAPTURE = 1;
+    static int idCount = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -34,23 +35,8 @@ public class MainActivity extends Activity
         ListView sightListView = (ListView) findViewById(R.id.sightList);
         sightListView.setAdapter(adapter);
 
-        adapter.add(new Sight(1, "Test Worksite", new Geofence()
-        {
-            @Override
-            public String getRequestId()
-            {
-                return null;
-            }
-        }));
-
-        adapter.add(new Sight(2, "Test Worksite2", new Geofence()
-        {
-            @Override
-            public String getRequestId()
-            {
-                return null;
-            }
-        }));
+        adapter.add(new Sight(1, "Test Worksite"));
+        adapter.add(new Sight(2, "Test Worksite2"));
     }
 
     @Override
@@ -102,6 +88,12 @@ public class MainActivity extends Activity
         if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
             startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
         }
+    }
+
+    public static int getNewID()
+    {
+        idCount++;
+        return idCount;
     }
 
     private void populateSightList()
