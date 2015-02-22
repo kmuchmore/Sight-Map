@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="360dp"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:id="@+id/newSightC"
+    tools:context = ".NewSightActivity">
+
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/sightName"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:text="Sight Name"
+        android:textSize="24dp" />
+
+    <fragment
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:name="com.google.android.gms.maps.MapFragment"
+        android:id="@+id/gMap"
+        android:layout_alignEnd="@id/sightName"
+        android:layout_alignParentStart="true"
+        android:layout_below="@id/sightName"
+        android:layout_alignParentEnd="false"
+        android:layout_alignParentBottom="true" />
+
+    <ToggleButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/add_geofence"
+        android:id="@+id/addGeoFence"
+        android:textOn="@string/addGeoOn"
+        android:textOff="@string/addGeoOff"
+        android:layout_alignParentBottom="true"
+        android:layout_toStartOf="@+id/geoClear"
+        android:onClick="toggleAddGeoPoints"
+        android:alpha="0.85" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/clear"
+        android:id="@+id/geoClear"
+        android:layout_alignParentBottom="true"
+        android:layout_toStartOf="@+id/sightSave"
+        android:onClick="clearMap"
+        android:alpha="0.85" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/save"
+        android:id="@+id/sightSave"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:alpha="0.85"
+        android:nestedScrollingEnabled="true"
+        android:onClick="saveSight"/>
+
+</RelativeLayout>
