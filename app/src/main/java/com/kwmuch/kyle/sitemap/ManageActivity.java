@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -16,6 +17,7 @@ import com.google.android.gms.location.Geofence;
 import java.util.ArrayList;
 
 import items.Sight;
+import items.SightDap;
 import utils.SightArrayAdapter;
 
 /**
@@ -25,7 +27,7 @@ public class ManageActivity extends Activity
 {
     public static final int NEW_SIGHT_REQUEST = 1;
     public static final String PAR_KEY = "com.kwmuch.kyle.sightmap.spar";
-
+    SightArrayAdapter adapter = null;
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -34,13 +36,10 @@ public class ManageActivity extends Activity
 
         getActionBar().setDisplayHomeAsUpEnabled(true);
 
-        ArrayList<Sight> sightArrayList = new ArrayList<Sight>();
-        SightArrayAdapter adapter = new SightArrayAdapter(this, sightArrayList, R.layout.manage_sight_list_item);
-
+        ArrayList<Sight> sightArrayList = (ArrayList<Sight>) SightDap.INSTANCE.getModel();
+        adapter = new SightArrayAdapter(this, sightArrayList, R.layout.manage_sight_list_item);
         ListView sightListView = (ListView) findViewById(R.id.sightList2);
         sightListView.setAdapter(adapter);
-
-        adapter.add(new Sight());
     }
 
     @Override
@@ -65,23 +64,31 @@ public class ManageActivity extends Activity
         ns.putExtras(sendBundle);
 
         startActivityForResult(ns, NEW_SIGHT_REQUEST);
-
-        Person mPerson = new Person();
-        mPerson.setName("Leon");
-        mPerson.setAge(25);
-        Intent mIntent = new Intent(this,ObjectTranDemo1.class);
-        Bundle mBundle = new Bundle();
-        mBundle.putSerializable(SER_KEY,mPerson);
-        mIntent.putExtras(mBundle);
-        startActivity(mIntent);
-
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == RESULT_OK && requestCode == NEW_SIGHT_REQUEST) {
-            if (data.hasExtra("retSight")) {
-                Sight newSight = data.getExtras().getParcelable("retSight");
+            Sight retSight = (Sight)data.getParcelableExtra(ManageActivity.PAR_KEY);
+            Log.w("Locations", "Got sight back");
+            int loc = -1;
+            for (Sight s: SightDap.INSTANCE.getModel())
+            {
+                if(s.getmId() == retSight.getmId())
+                {
+                    loc = SightDap.INSTANCE.getModel().indexOf(s);
+                    continue;
+                }
+            }
+            if(loc != -1)
+            {
+                SightDap.INSTANCE.getModel().set(loc, retSight);
+                SightDap.INSTANCE.updateFile();
+            }
+            else
+            {
+                SightDap.INSTANCE.getModel().add(retSight);
+                adapter.notifyDataSetChanged();
             }
         }
     }

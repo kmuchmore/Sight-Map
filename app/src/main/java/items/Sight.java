@@ -4,31 +4,36 @@ import android.graphics.Bitmap;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.google.android.gms.location.Geofence;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
 import com.kwmuch.kyle.sitemap.MainActivity;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.Vector;
 
 /**
  * Created by Kyle on 1/20/2015.
  */
 public class Sight implements Parcelable{
+    @SerializedName("id")
     private int mId;
+    @SerializedName("name")
     private String mSiteName;
+    @SerializedName("fence")
     private List<LatLng> mSiteFencePoly;
+    @SerializedName("updated")
     private Date mLastUpdated;
+    @SerializedName("path")
     private String mFolderPath;
+    @SerializedName("num")
     private int mNumPics;
 
     public Sight() {
         this.mId = MainActivity.getNewID();
-        this.mSiteName = "Unnamed";
+        this.mSiteName = "Sight Name";
         mSiteFencePoly = new ArrayList<LatLng>();
         this.mLastUpdated = Calendar.getInstance().getTime();
         this.mFolderPath = null;

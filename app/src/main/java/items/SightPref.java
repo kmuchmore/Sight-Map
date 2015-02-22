@@ -36,7 +36,7 @@ public class SightPref {
     {
         String sight_json = obj2Gson(sight);
         // store in SharedPreferences
-        String id =  "" +  sight.getId(); // get storage key
+        String id =  "" +  sight.getmId(); // get storage key
         editor.putString(id, sight_json);
         editor.commit();
     }

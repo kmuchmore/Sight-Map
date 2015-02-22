@@ -33,6 +33,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolygonOptions;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Vector;
@@ -65,7 +66,7 @@ public class NewSightActivity extends FragmentActivity implements
     //UI variables
     private EditText mSightName = null;
     private Button mAddGeoFenceButton = null;
-    private Vector<LatLng> geoFencePolygonPoints = null;
+    private ArrayList<LatLng> geoFencePolygonPoints = null;
     private Sight mCurrentSight = null;
 
     //@TODO Pass in Sight and have it return that... not sure how
@@ -82,7 +83,7 @@ public class NewSightActivity extends FragmentActivity implements
 
         mSightName = (EditText) findViewById(R.id.sightName);
         mAddGeoFenceButton = (Button) findViewById(R.id.addGeoFence);
-        geoFencePolygonPoints = new Vector<LatLng>();
+        geoFencePolygonPoints = new ArrayList<LatLng>();
 
         buildGoogleApiClient();
         createLocationRequest();
@@ -170,12 +171,15 @@ public class NewSightActivity extends FragmentActivity implements
 
     public void saveSight(View view)
     {
+        mCurrentSight.setmSiteName(mSightName.getText().toString());
+        mCurrentSight.setmSiteFencePoly(geoFencePolygonPoints);
         int resultCode = ManageActivity.NEW_SIGHT_REQUEST;
-        Sight retSight = new Sight(MainActivity.getNewID(), m_Text);
-        Parcel retParcel;
-        retSight.writeToParcel(retParcel, );
+        Bundle cb = new Bundle();
+        cb.putParcelable(ManageActivity.PAR_KEY, mCurrentSight);
+
         Intent retI = new Intent();
-        retI.putExtra("retSight", retSight);
+        retI.putExtras(cb);
+
         setResult(RESULT_OK, retI);
         finish();
     }
