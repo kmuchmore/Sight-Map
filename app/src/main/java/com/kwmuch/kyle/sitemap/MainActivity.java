@@ -41,8 +41,8 @@ public class MainActivity extends Activity
         setContentView(R.layout.activity_main);
 
         SightDap.INSTANCE.init(this);
-        ArrayList<Sight> sightArrayList = (ArrayList<Sight>) SightDap.INSTANCE.getModel();
-        SightArrayAdapter adapter = new SightArrayAdapter(this, sightArrayList, R.layout.main_sight_list_item);
+        List<Sight> sightArrayList = SightDap.INSTANCE.getModel();
+        SightArrayAdapter adapter = new SightArrayAdapter(this, R.layout.main_sight_list_item, (ArrayList<Sight>) sightArrayList);
 
         ListView sightListView = (ListView) findViewById(R.id.sightList);
         sightListView.setAdapter(adapter);

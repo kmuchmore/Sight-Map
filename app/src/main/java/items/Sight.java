@@ -40,6 +40,15 @@ public class Sight implements Parcelable{
         this.mNumPics = 0;
     }
 
+    public Sight(int id) {
+        this.mId = id;
+        this.mSiteName = "Sight Name";
+        mSiteFencePoly = new ArrayList<LatLng>();
+        this.mLastUpdated = Calendar.getInstance().getTime();
+        this.mFolderPath = null;
+        this.mNumPics = 0;
+    }
+
     public Sight(String mSiteName) {
         this.mId = MainActivity.getNewID();
         this.mSiteName = mSiteName;
@@ -61,7 +70,7 @@ public class Sight implements Parcelable{
 
     public static final Parcelable.Creator<Sight> CREATOR = new Creator<Sight>() {
         public Sight createFromParcel(Parcel source) {
-            Sight newSight = new Sight();
+            Sight newSight = new Sight(0);
             newSight.mId = source.readInt();
             newSight.mSiteName = source.readString();
 

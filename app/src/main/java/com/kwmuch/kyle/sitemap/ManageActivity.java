@@ -15,6 +15,7 @@ import android.widget.Toast;
 import com.google.android.gms.location.Geofence;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import items.Sight;
 import items.SightDap;
@@ -28,6 +29,9 @@ public class ManageActivity extends Activity
     public static final int NEW_SIGHT_REQUEST = 1;
     public static final String PAR_KEY = "com.kwmuch.kyle.sightmap.spar";
     SightArrayAdapter adapter = null;
+    ArrayList<Sight> mDataList = null;
+    ListView sightListView = null;
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -36,10 +40,12 @@ public class ManageActivity extends Activity
 
         getActionBar().setDisplayHomeAsUpEnabled(true);
 
-        ArrayList<Sight> sightArrayList = (ArrayList<Sight>) SightDap.INSTANCE.getModel();
-        adapter = new SightArrayAdapter(this, sightArrayList, R.layout.manage_sight_list_item);
-        ListView sightListView = (ListView) findViewById(R.id.sightList2);
+//        dataList = SightDap.INSTANCE.getModel();
+        mDataList = (ArrayList<Sight>) SightDap.INSTANCE.getModel();
+        adapter = new SightArrayAdapter(this, R.layout.manage_sight_list_item, mDataList);
+        sightListView = (ListView) findViewById(R.id.sightList2);
         sightListView.setAdapter(adapter);
+//        adapter.fil
     }
 
     @Override
@@ -72,24 +78,33 @@ public class ManageActivity extends Activity
             Sight retSight = (Sight)data.getParcelableExtra(ManageActivity.PAR_KEY);
             Log.w("Locations", "Got sight back");
             int loc = -1;
-            for (Sight s: SightDap.INSTANCE.getModel())
+            for (Sight s: mDataList)
             {
                 if(s.getmId() == retSight.getmId())
                 {
-                    loc = SightDap.INSTANCE.getModel().indexOf(s);
+                    loc = mDataList.indexOf(s);
                     continue;
                 }
             }
             if(loc != -1)
             {
-                SightDap.INSTANCE.getModel().set(loc, retSight);
+                mDataList.set(loc, retSight);
                 SightDap.INSTANCE.updateFile();
             }
             else
             {
-                SightDap.INSTANCE.getModel().add(retSight);
+                mDataList.add(retSight);
                 adapter.notifyDataSetChanged();
             }
         }
+    }
+
+    public void deleteSight(View view) {
+        int rmSight = ((Integer)view.getTag());
+        adapter.remove(adapter.getItem(rmSight));
+        sightListView.setAdapter(adapter);
+//        adapter.
+
+        adapter.notifyDataSetChanged();
     }
 }
