@@ -1,7 +1,6 @@
 package utils;
 
 import android.content.Context;
-import android.text.Layout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,6 +23,7 @@ public class SightArrayAdapter extends ArrayAdapter<Sight>
     private static class SightHolder
     {
         TextView sightTitle;
+        TextView numPics;
         ImageButton viewCollectionBtn;
         ImageButton editBtn;
         ImageButton deleteBtn;
@@ -52,6 +52,7 @@ public class SightArrayAdapter extends ArrayAdapter<Sight>
             {
                 case R.layout.main_sight_list_item:
                     sightHolder.viewCollectionBtn = (ImageButton) convertView.findViewById(R.id.view_collections);
+                    sightHolder.numPics = (TextView) convertView.findViewById(R.id.num_photos);
                     break;
                 case R.layout.manage_sight_list_item:
                     sightHolder.editBtn = (ImageButton) convertView.findViewById(R.id.edit_sight);
@@ -70,6 +71,7 @@ public class SightArrayAdapter extends ArrayAdapter<Sight>
         switch (sightLayout)
         {
             case R.layout.main_sight_list_item:
+                sightHolder.numPics.setText(sight.getmNumPics() + " Photos");
                 sightHolder.viewCollectionBtn.setImageResource(R.drawable.ic_action_picture);
                 break;
             case R.layout.manage_sight_list_item:

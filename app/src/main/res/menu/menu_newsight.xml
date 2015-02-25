@@ -1,0 +1,9 @@
+<menu xmlns:android = "http://schemas.android.com/apk/res/android"
+    xmlns:tools = "http://schemas.android.com/tools"
+    tools:context = ".NewSightActivity">
+    <item
+        android:id = "@+id/goto_location"
+        android:orderInCategory = "50"
+        android:showAsAction = "always"
+        android:title = "@string/gotoLocation" />
+</menu><!--xmlns:app="http://schemas.android.com/apk/res-auto"-->

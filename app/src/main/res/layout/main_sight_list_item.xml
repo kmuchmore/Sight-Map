@@ -23,7 +23,7 @@
         android:layout_toStartOf = "@+id/view_collections" />
 
     <TextView
-        android:id = "@+id/textView2"
+        android:id = "@+id/num_photos"
         android:layout_width = "wrap_content"
         android:layout_height = "wrap_content"
         android:text = "1337 photos"

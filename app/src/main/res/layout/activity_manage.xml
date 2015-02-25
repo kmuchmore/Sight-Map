@@ -9,11 +9,13 @@
         android:id = "@+id/sightList2"
         android:layout_width = "match_parent"
         android:layout_height = "389dp"
-        android:layout_weight = "0.93" />
+        android:layout_weight = "0.93"
+        android:text="No Results"/>
 
     <Button
         android:id = "@+id/addSightBtn"
         android:layout_width = "match_parent"
         android:layout_height = "wrap_content"
-        android:text = "Add Sight" />
+        android:text = "Add Sight"
+        android:onClick="newSight" />
 </LinearLayout>
