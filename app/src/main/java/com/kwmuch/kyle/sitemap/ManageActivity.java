@@ -7,15 +7,9 @@ import android.support.v4.app.NavUtils;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ListView;
-import android.widget.Button;
-import android.widget.Toast;
-
-import com.google.android.gms.location.Geofence;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import items.Sight;
 import items.SightDap;
@@ -73,38 +67,38 @@ public class ManageActivity extends Activity
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    protected void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
         if (resultCode == RESULT_OK && requestCode == NEW_SIGHT_REQUEST) {
-            Sight retSight = (Sight)data.getParcelableExtra(ManageActivity.PAR_KEY);
+            Sight retSight = (Sight) data.getParcelableExtra(ManageActivity.PAR_KEY);
             Log.w("Locations", "Got sight back");
             int loc = -1;
-            for (Sight s: mDataList)
-            {
-                if(s.getmId() == retSight.getmId())
-                {
+            for (Sight s : mDataList) {
+                if (s.getmId() == retSight.getmId()) {
                     loc = mDataList.indexOf(s);
                     continue;
                 }
             }
-            if(loc != -1)
-            {
+            if (loc != -1) {
                 mDataList.set(loc, retSight);
                 SightDap.INSTANCE.updateFile();
             }
-            else
-            {
+            else {
                 mDataList.add(retSight);
                 adapter.notifyDataSetChanged();
+                SightDap.INSTANCE.updateFile();
             }
         }
     }
 
-    public void deleteSight(View view) {
-        int rmSight = ((Integer)view.getTag());
+    public void deleteSight(View view)
+    {
+        int rmSight = ((Integer) view.getTag());
         adapter.remove(adapter.getItem(rmSight));
         sightListView.setAdapter(adapter);
 //        adapter.
 
         adapter.notifyDataSetChanged();
+        SightDap.INSTANCE.updateFile();
     }
 }

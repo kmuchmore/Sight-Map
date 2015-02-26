@@ -46,7 +46,7 @@ public enum SightDap
         Gson gson = new Gson();
         try {
             BufferedReader br = new BufferedReader(new FileReader(c.getFilesDir() + "/" + fileDataName));
-            contentProvider = gson.fromJson(new FileReader("file"), new TypeToken<List<Sight>>(){}.getType());
+            contentProvider = gson.fromJson(new FileReader(c.getFilesDir() + "/" + fileDataName), new TypeToken<List<Sight>>(){}.getType());
         } catch (FileNotFoundException e) {
             e.printStackTrace();
             Log.w("Setup", "File not found");
