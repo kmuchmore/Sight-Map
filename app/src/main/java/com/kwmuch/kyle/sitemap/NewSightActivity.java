@@ -34,6 +34,7 @@ import com.google.android.gms.maps.model.PolygonOptions;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 import java.util.Vector;
@@ -173,6 +174,7 @@ public class NewSightActivity extends FragmentActivity implements
     {
         mCurrentSight.setmSiteName(mSightName.getText().toString());
         mCurrentSight.setmSiteFencePoly(geoFencePolygonPoints);
+        mCurrentSight.setmLastUpdated(Calendar.getInstance().getTime());
         int resultCode = ManageActivity.NEW_SIGHT_REQUEST;
         Bundle cb = new Bundle();
         cb.putParcelable(ManageActivity.PAR_KEY, mCurrentSight);

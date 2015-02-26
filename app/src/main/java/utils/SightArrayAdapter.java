@@ -11,6 +11,7 @@ import android.widget.TextView;
 
 import com.kwmuch.kyle.sitemap.R;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,8 +41,9 @@ public class SightArrayAdapter extends ArrayAdapter<Sight> {
             sightHolder.sightTitle = (TextView) convertView.findViewById(R.id.sight_title);
             switch (sightLayout) {
                 case R.layout.main_sight_list_item:
-                    sightHolder.viewCollectionBtn = (ImageButton) convertView.findViewById(R.id.view_collections);
                     sightHolder.numPics = (TextView) convertView.findViewById(R.id.num_photos);
+                    sightHolder.viewCollectionBtn = (ImageButton) convertView.findViewById(R.id.view_collections);
+                    sightHolder.date = (TextView) convertView.findViewById(R.id.date_updated);
                     break;
                 case R.layout.manage_sight_list_item:
                     sightHolder.editBtn = (ImageButton) convertView.findViewById(R.id.edit_sight);
@@ -69,6 +71,8 @@ public class SightArrayAdapter extends ArrayAdapter<Sight> {
             case R.layout.main_sight_list_item:
                 sightHolder.numPics.setText(sightHolder.sight.getmNumPics() + " Photos");
                 sightHolder.viewCollectionBtn.setImageResource(R.drawable.ic_action_picture);
+                SimpleDateFormat sdf = new SimpleDateFormat("MM-dd-yyyy");
+                sightHolder.date.setText(sdf.format(sightHolder.sight.getmLastUpdated()));
                 break;
             case R.layout.manage_sight_list_item:
                 sightHolder.editBtn.setImageResource(R.drawable.ic_action_edit);
@@ -88,6 +92,7 @@ public class SightArrayAdapter extends ArrayAdapter<Sight> {
         Sight sight;
         TextView sightTitle;
         TextView numPics;
+        TextView date;
         ImageButton viewCollectionBtn;
         ImageButton editBtn;
         ImageButton deleteBtn;
