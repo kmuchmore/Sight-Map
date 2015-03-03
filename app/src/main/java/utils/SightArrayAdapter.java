@@ -50,14 +50,6 @@ public class SightArrayAdapter extends ArrayAdapter<Sight> {
                     sightHolder.editBtn.setTag(sightHolder.sight);
                     sightHolder.deleteBtn = (ImageButton) convertView.findViewById(R.id.delete_sight);
                     sightHolder.deleteBtn.setTag(new Integer(position));
-//                    sightHolder.deleteBtn.setOnClickListener(new View.OnClickListener() {
-//                        @Override
-//                        public void onClick(View v) {
-//                            Integer tag = (Integer) v.getTag();
-//                            deleteSight(tag);
-//                            notifyDataSetChanged();
-//                        }
-//                    });
                     break;
             }
             convertView.setTag(sightHolder);

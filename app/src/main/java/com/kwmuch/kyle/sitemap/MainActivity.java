@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.location.Location;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -39,12 +40,14 @@ public class MainActivity extends Activity implements
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener {
 
-    static final int REQUEST_IMAGE_CAPTURE = 1;
+    static final int REQUEST_TAKE_PHOTO = 1;
     static int idCount = 0;
     public GoogleApiClient mGoogleApiClient = null;
     boolean mIsReqLocUpdates = false;
     private Location mCurrentLocation = null;
     private LocationRequest mLocReq = null;
+    private Boolean addDate = true;
+    SightArrayAdapter adapter = null;
 
     public static int getNewID() {
         idCount++;
@@ -56,10 +59,9 @@ public class MainActivity extends Activity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
         SightDap.INSTANCE.init(this);
         List<Sight> sightArrayList = SightDap.INSTANCE.getModel();
-        SightArrayAdapter adapter = new SightArrayAdapter(this, R.layout.main_sight_list_item, (ArrayList<Sight>) sightArrayList);
+        adapter = new SightArrayAdapter(this, R.layout.main_sight_list_item, (ArrayList<Sight>) sightArrayList);
 
         ListView sightListView = (ListView) findViewById(R.id.sightList);
         sightListView.setAdapter(adapter);
@@ -97,31 +99,14 @@ public class MainActivity extends Activity implements
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
-            String imageSight = "Unknown";
-            String fileName = "error.jpg";
-            LatLng ll = new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude());
-            for (Sight s : SightDap.INSTANCE.getModel()) {
-                if (PolyUtil.containsLocation(ll, s.getmSiteFencePoly(), false)) {
-                    imageSight = s.getmSiteName();
-                    fileName = s.getmNumPics() + ".";
-                    continue;
-                }
-            }
-            Bundle extras = data.getExtras();
-            Bitmap imageBitmap = (Bitmap) extras.get("data");
-            File writeFile = getSightStoragePath(imageSight, fileName, true);
-            Log.w("Process", "New Image Filepath: " + writeFile.getAbsolutePath());
-
-            FileOutputStream fos = null;
-
-            try {
-                fos = new FileOutputStream(writeFile);
-                imageBitmap.compress(Bitmap.CompressFormat.PNG, 100, fos);
-                fos.close();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+        if (requestCode == REQUEST_TAKE_PHOTO && resultCode == RESULT_OK) {
+            Log.w("Process", "Took image");
+            updateFileNums();
+            adapter.notifyDataSetChanged();
+        }
+        else
+        {
+            Log.w("Process", "Something failed");
         }
     }
 
@@ -132,7 +117,17 @@ public class MainActivity extends Activity implements
     private void takePicture() {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-            startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+
+            File photoFile = null;
+            try {
+                photoFile = prepForImageCapture();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            if(photoFile != null) {
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(photoFile));
+                startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
+            }
         }
     }
 
@@ -207,45 +202,93 @@ public class MainActivity extends Activity implements
 
     }
 
-    public boolean isExternalStorageWritable() {
-        String state = Environment.getExternalStorageState();
-        if (Environment.MEDIA_MOUNTED.equals(state)) {
-            return true;
-        }
-        return false;
-    }
+//    private boolean isExternalStorageReadable() {
+//        String state = Environment.getExternalStorageState();
+//        if (Environment.MEDIA_MOUNTED.equals(state) || Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)) {
+//            return true;
+//        }
+//        return false;
+//    }
 
-    public boolean isExternalStorageReadable() {
-        String state = Environment.getExternalStorageState();
-        if (Environment.MEDIA_MOUNTED.equals(state) || Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)) {
-            return true;
-        }
-        return false;
-    }
+//    private boolean isExternalStorageWritable() {
+//        String state = Environment.getExternalStorageState();
+//        if (Environment.MEDIA_MOUNTED.equals(state)) {
+//            return true;
+//        }
+//        return false;
+//    }
+//
+//    private File getSightStorageDir(String sightName) {
+//        String dirPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).toString() + "/Sight Map";
+//
+//        File file = new File(dirPath, sightName);
+//        if(!isExternalStorageWritable()) {
+//            Log.w("Setup", "SD Card is not writable");
+//        }
+//        if(!file.exists()) {
+//            if (!file.mkdirs()) {
+//                Log.w("Setup", "Could not create path to " + file.getAbsolutePath());
+//            }
+//        }
+//        return file;
+//    }
 
-    public File getSightStoragePath(String sightName, String fileName, boolean addDate) {
-        String dirPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) + "/SightMap/" + sightName;
-//        String dirPath = "/mnt/shared/sdcard/SightMap/" + sightName;
+    private File createImageFile(Sight s) {
+        String fileName = String.format("%03d", s.getmNumPics());
+
         if(addDate) {
             SimpleDateFormat sdf = new SimpleDateFormat("MM-dd-yyyy");
-            fileName = fileName + sdf.format(Calendar.getInstance().getTime()) + ".jpg";
-        }
-        else {
-            fileName = fileName + ".jpg";
+            fileName = fileName + "_" +sdf.format(Calendar.getInstance().getTime()) + ".jpg";
+            int index = SightDap.INSTANCE.getModel().indexOf(s);
+            SightDap.INSTANCE.getModel().get(index).setmLastUpdated(Calendar.getInstance().getTime());
         }
 
-        File file = new File(dirPath, "test/");
-        if(!isExternalStorageWritable()) {
-            Log.w("Setup", "SD Card is not writable");
-        }
-        if (!file.exists()) {
-            try {
-                if(!file.createNewFile())
-                    Log.w("Setup", "Could not create path to " + file.getAbsolutePath());
-            } catch (IOException e) {
-                e.printStackTrace();
+//        File fileDir = getSightStorageDir(s.getmSiteName());
+        File fileDir = new File(s.getmFolderPath());
+        File fileOut = new File(fileDir, fileName);
+
+        return fileOut;
+    }
+
+    private File prepForImageCapture() throws IOException {
+        Sight newImageSight = null;
+        LatLng ll = new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude());
+        for (Sight s : SightDap.INSTANCE.getModel()) {
+            if (PolyUtil.containsLocation(ll, s.getmSiteFencePoly(), false)) {
+                newImageSight = s;
+                break;
             }
         }
-        return file;
+        String imageSight = newImageSight.getmSiteName();
+
+        File imageFile = createImageFile(newImageSight);
+        Log.w("Process", "New Image Filepath: " + imageFile.getAbsolutePath());
+        return imageFile;
     }
+
+    private void updateFileNums() {
+        for(Sight s : SightDap.INSTANCE.getModel()) {
+            File dirFile = new File(s.getmFolderPath());
+            s.setmNumPics(dirFile.list().length);
+        }
+    }
+
+//    private boolean saveImageToFile(File imageFile, Bitmap imageBitmap) {
+//        boolean success = false;
+//        FileOutputStream fos = null;
+//
+//        try {
+//            fos = new FileOutputStream(imageFile);
+//            imageBitmap.compress(Bitmap.CompressFormat.PNG, 100, fos);
+//
+//            fos.flush();
+//            fos.close();
+//            success = true;
+//        } catch (FileNotFoundException e) {
+//            e.printStackTrace();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//        return success;
+//    }
 }

@@ -1,6 +1,7 @@
 package com.kwmuch.kyle.sitemap;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
@@ -8,15 +9,19 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Parcel;
 import android.support.v4.app.FragmentActivity;
 import android.text.InputType;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -32,6 +37,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolygonOptions;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -83,6 +89,26 @@ public class NewSightActivity extends FragmentActivity implements
         mMapFragment.getMapAsync(this);
 
         mSightName = (EditText) findViewById(R.id.sightName);
+
+        mSightName.setOnKeyListener(new View.OnKeyListener()
+        {
+            /**
+             * This listens for the user to press the enter button on
+             * the keyboard and then hides the virtual keyboard
+             */
+            public boolean onKey(View arg0, int arg1, KeyEvent event) {
+                // If the event is a key-down event on the "enter" button
+                if ( (event.getAction() == KeyEvent.ACTION_DOWN  ) &&
+                        (arg1           == KeyEvent.KEYCODE_ENTER)   )
+                {
+                    InputMethodManager imm = (InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(mSightName.getWindowToken(), 0);
+                    return true;
+                }
+                return false;
+            }
+        } );
+
         mAddGeoFenceButton = (Button) findViewById(R.id.addGeoFence);
         geoFencePolygonPoints = new ArrayList<LatLng>();
 
@@ -174,6 +200,9 @@ public class NewSightActivity extends FragmentActivity implements
         mCurrentSight.setmSiteName(mSightName.getText().toString());
         mCurrentSight.setmSiteFencePoly(geoFencePolygonPoints);
         mCurrentSight.setmLastUpdated(Calendar.getInstance().getTime());
+
+        mCurrentSight.setmFolderPath(getSightStorageDir(mCurrentSight.getmSiteName()).toString());
+
         int resultCode = ManageActivity.NEW_SIGHT_REQUEST;
         Bundle cb = new Bundle();
         cb.putParcelable(ManageActivity.PAR_KEY, mCurrentSight);
@@ -338,5 +367,28 @@ public class NewSightActivity extends FragmentActivity implements
                 drawPolygonGeoFence();
             }
         }
+    }
+
+    private File getSightStorageDir(String sightName) {
+        String dirPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).toString() + "/Sight Map";
+
+        File file = new File(dirPath, sightName);
+        if(!isExternalStorageWritable()) {
+            Log.w("Setup", "SD Card is not writable");
+        }
+        if(!file.exists()) {
+            if (!file.mkdirs()) {
+                Log.w("Setup", "Could not create path to " + file.getAbsolutePath());
+            }
+        }
+        return file;
+    }
+
+    private boolean isExternalStorageWritable() {
+        String state = Environment.getExternalStorageState();
+        if (Environment.MEDIA_MOUNTED.equals(state)) {
+            return true;
+        }
+        return false;
     }
 }
