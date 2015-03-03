@@ -147,7 +147,6 @@ public class NewSightActivity extends FragmentActivity implements
         {
             startLocationUpdates();
         }
-
     }
 
     protected void createLocationRequest() {
