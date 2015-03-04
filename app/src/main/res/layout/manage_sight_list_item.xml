@@ -21,7 +21,8 @@
         android:layout_height = "wrap_content"
         android:src="@drawable/ic_action_remove"
         android:layout_centerVertical="true"
-        android:layout_alignParentEnd = "true" />
+        android:layout_alignParentEnd = "true"
+        android:onClick="deleteSight" />
 
     <ImageButton
         android:id = "@+id/edit_sight"

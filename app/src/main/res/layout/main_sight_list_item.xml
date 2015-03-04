@@ -18,9 +18,9 @@
         android:id = "@+id/date_updated"
         android:layout_width = "wrap_content"
         android:layout_height = "wrap_content"
-        android:text = "Updated: 01-01-2015"
-        android:layout_alignBottom = "@+id/sight_title"
-        android:layout_toStartOf = "@+id/view_collections" />
+        android:text = "01-01-2015"
+        android:layout_alignTop="@+id/num_photos"
+        android:layout_toStartOf="@+id/view_collections"/>
 
     <TextView
         android:id = "@+id/num_photos"
@@ -39,5 +39,14 @@
         android:src="@drawable/ic_action_picture"
         android:layout_alignTop = "@+id/sight_title"
         android:layout_alignParentEnd = "true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Updated:"
+        android:id="@+id/updatedTxt"
+        android:layout_alignParentTop="true"
+        android:layout_alignStart="@+id/date_updated"
+        android:layout_alignEnd="@+id/date_updated"/>
 
 </RelativeLayout>
