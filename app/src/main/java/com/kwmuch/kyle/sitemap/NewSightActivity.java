@@ -76,8 +76,6 @@ public class NewSightActivity extends FragmentActivity implements
     private ArrayList<LatLng> geoFencePolygonPoints = null;
     private Sight mCurrentSight = null;
 
-    //@TODO Pass in Sight and have it return that... not sure how
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -369,7 +367,7 @@ public class NewSightActivity extends FragmentActivity implements
         }
     }
 
-    private File getSightStorageDir(String sightName) {
+    public  static File getSightStorageDir(String sightName) {
         String dirPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).toString() + "/Sight Map";
 
         File file = new File(dirPath, sightName);
@@ -384,7 +382,7 @@ public class NewSightActivity extends FragmentActivity implements
         return file;
     }
 
-    private boolean isExternalStorageWritable() {
+    public static boolean isExternalStorageWritable() {
         String state = Environment.getExternalStorageState();
         if (Environment.MEDIA_MOUNTED.equals(state)) {
             return true;

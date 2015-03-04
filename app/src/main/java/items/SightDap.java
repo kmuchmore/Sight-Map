@@ -5,6 +5,7 @@ import android.util.Log;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.kwmuch.kyle.sitemap.NewSightActivity;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -50,6 +51,10 @@ public enum SightDap
         } catch (FileNotFoundException e) {
             e.printStackTrace();
             Log.w("Setup", "File not found");
+            Sight unknownSight = new Sight("Unknown Sight");
+            String dirName = NewSightActivity.getSightStorageDir(unknownSight.getmSiteName()).toString();
+            unknownSight.setmFolderPath(dirName);
+            SightDap.INSTANCE.getModel().add(unknownSight);
         }
     }
 

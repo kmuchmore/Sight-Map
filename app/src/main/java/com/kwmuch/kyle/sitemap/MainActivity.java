@@ -68,6 +68,7 @@ public class MainActivity extends Activity implements
 
         buildGoogleApiClient();
         createLocationRequest();
+        updateFileNums();
     }
 
     @Override
@@ -93,7 +94,6 @@ public class MainActivity extends Activity implements
             case R.id.capture_image:
                 takePicture();
         }
-
         return super.onOptionsItemSelected(item);
     }
 
@@ -103,6 +103,7 @@ public class MainActivity extends Activity implements
             Log.w("Process", "Took image");
             updateFileNums();
             adapter.notifyDataSetChanged();
+            SightDap.INSTANCE.updateFile();
         }
         else
         {
@@ -194,12 +195,12 @@ public class MainActivity extends Activity implements
 
     @Override
     public void onConnectionSuspended(int i) {
-
+        Log.w("Setup", "Connection was disrupted");
     }
 
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
-
+        Log.w("Setup", "Connection has failed");
     }
 
 //    private boolean isExternalStorageReadable() {
@@ -234,7 +235,7 @@ public class MainActivity extends Activity implements
 //    }
 
     private File createImageFile(Sight s) {
-        String fileName = String.format("%03d", s.getmNumPics());
+        String fileName = String.format("%03d", s.getmIttVal());
 
         if(addDate) {
             SimpleDateFormat sdf = new SimpleDateFormat("MM-dd-yyyy");
@@ -252,14 +253,22 @@ public class MainActivity extends Activity implements
 
     private File prepForImageCapture() throws IOException {
         Sight newImageSight = null;
-        LatLng ll = new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude());
-        for (Sight s : SightDap.INSTANCE.getModel()) {
-            if (PolyUtil.containsLocation(ll, s.getmSiteFencePoly(), false)) {
-                newImageSight = s;
-                break;
+        LatLng ll = null;
+        if(mCurrentLocation != null)
+        {
+            ll = new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude());
+            for (Sight s : SightDap.INSTANCE.getModel()) {
+                if (PolyUtil.containsLocation(ll, s.getmSiteFencePoly(), false)) {
+                    newImageSight = s;
+                    break;
+                }
             }
+            String imageSight = newImageSight.getmSiteName();
         }
-        String imageSight = newImageSight.getmSiteName();
+        else {
+//            newImageSight =
+            //@TODO Figure out how to initialize this
+        }
 
         File imageFile = createImageFile(newImageSight);
         Log.w("Process", "New Image Filepath: " + imageFile.getAbsolutePath());
