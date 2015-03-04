@@ -1,6 +1,8 @@
 package com.kwmuch.kyle.sitemap;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
@@ -9,6 +11,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
 
+import java.io.File;
 import java.util.ArrayList;
 
 import items.Sight;
@@ -93,12 +96,55 @@ public class ManageActivity extends Activity
 
     public void deleteSight(View view)
     {
-        int rmSight = ((Integer) view.getTag());
-        adapter.remove(adapter.getItem(rmSight));
+        int rmSightIndex = ((Integer) view.getTag());
+        Sight rmSight = adapter.getItem(rmSightIndex);
+
+        deleteSightDialog(rmSight.getmSiteName(), view);
+    }
+
+    private void processDeleteSight(View view) {
+        int rmSightIndex = ((Integer) view.getTag());
+        Sight rmSight = adapter.getItem(rmSightIndex);
+
+        File dir = new File(rmSight.getmFolderPath());
+        if(dir.isDirectory())
+        {
+            String[] children = dir.list();
+            for (int i = 0; i < children.length; i++) {
+                new File(dir, children[i]).delete();
+            }
+        }
+        if(!dir.delete())
+        {
+            Log.w("Process", "Delete Failed");
+        }
+
+        adapter.remove(rmSight);
         sightListView.setAdapter(adapter);
-//        adapter.
 
         adapter.notifyDataSetChanged();
         SightDap.INSTANCE.updateFile();
+    }
+
+    private void deleteSightDialog(String sightName, final View view) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Are you sure?");
+        builder.setMessage("This will delete all images associated with this sight");
+
+        // Set up the buttons
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                processDeleteSight(view);
+            }
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        builder.show();
     }
 }

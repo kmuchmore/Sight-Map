@@ -15,7 +15,8 @@
         android:layout_alignParentTop="true"
         android:layout_alignParentStart="true"
         android:layout_alignParentEnd="true"
-        android:text="Sight Name"
+        android:hint="Enter Sight Name"
+        android:inputType="textCapSentences"
         android:textSize="24dp" />
 
     <fragment
@@ -39,7 +40,8 @@
         android:layout_alignParentBottom="true"
         android:layout_toStartOf="@+id/geoClear"
         android:onClick="toggleAddGeoPoints"
-        android:alpha="0.85" />
+        android:background="@android:drawable/btn_default"
+        />
 
     <Button
         android:layout_width="wrap_content"
@@ -49,7 +51,8 @@
         android:layout_alignParentBottom="true"
         android:layout_toStartOf="@+id/sightSave"
         android:onClick="clearMap"
-        android:alpha="0.85" />
+        android:background="@android:drawable/btn_default"
+        />
 
     <Button
         android:layout_width="wrap_content"
@@ -58,8 +61,9 @@
         android:id="@+id/sightSave"
         android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"
-        android:alpha="0.85"
         android:nestedScrollingEnabled="true"
-        android:onClick="saveSight"/>
+        android:onClick="saveSight"
+        android:background="@android:drawable/btn_default"
+        />
 
 </RelativeLayout>

@@ -203,37 +203,6 @@ public class MainActivity extends Activity implements
         Log.w("Setup", "Connection has failed");
     }
 
-//    private boolean isExternalStorageReadable() {
-//        String state = Environment.getExternalStorageState();
-//        if (Environment.MEDIA_MOUNTED.equals(state) || Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)) {
-//            return true;
-//        }
-//        return false;
-//    }
-
-//    private boolean isExternalStorageWritable() {
-//        String state = Environment.getExternalStorageState();
-//        if (Environment.MEDIA_MOUNTED.equals(state)) {
-//            return true;
-//        }
-//        return false;
-//    }
-//
-//    private File getSightStorageDir(String sightName) {
-//        String dirPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).toString() + "/Sight Map";
-//
-//        File file = new File(dirPath, sightName);
-//        if(!isExternalStorageWritable()) {
-//            Log.w("Setup", "SD Card is not writable");
-//        }
-//        if(!file.exists()) {
-//            if (!file.mkdirs()) {
-//                Log.w("Setup", "Could not create path to " + file.getAbsolutePath());
-//            }
-//        }
-//        return file;
-//    }
-
     private File createImageFile(Sight s) {
         String fileName = String.format("%03d", s.getmIttVal());
 
@@ -244,7 +213,6 @@ public class MainActivity extends Activity implements
             SightDap.INSTANCE.getModel().get(index).setmLastUpdated(Calendar.getInstance().getTime());
         }
 
-//        File fileDir = getSightStorageDir(s.getmSiteName());
         File fileDir = new File(s.getmFolderPath());
         File fileOut = new File(fileDir, fileName);
 
@@ -263,11 +231,15 @@ public class MainActivity extends Activity implements
                     break;
                 }
             }
+            if(newImageSight == null)
+            {
+                newImageSight = SightDap.INSTANCE.getModel().get(0);
+            }
             String imageSight = newImageSight.getmSiteName();
         }
         else {
-//            newImageSight =
-            //@TODO Figure out how to initialize this
+            newImageSight = SightDap.INSTANCE.getModel().get(0);
+            String imageSight = newImageSight.getmSiteName();
         }
 
         File imageFile = createImageFile(newImageSight);
@@ -281,23 +253,4 @@ public class MainActivity extends Activity implements
             s.setmNumPics(dirFile.list().length);
         }
     }
-
-//    private boolean saveImageToFile(File imageFile, Bitmap imageBitmap) {
-//        boolean success = false;
-//        FileOutputStream fos = null;
-//
-//        try {
-//            fos = new FileOutputStream(imageFile);
-//            imageBitmap.compress(Bitmap.CompressFormat.PNG, 100, fos);
-//
-//            fos.flush();
-//            fos.close();
-//            success = true;
-//        } catch (FileNotFoundException e) {
-//            e.printStackTrace();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//        return success;
-//    }
 }
