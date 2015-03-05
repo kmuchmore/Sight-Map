@@ -250,6 +250,10 @@ public class MainActivity extends Activity implements
     private void updateFileNums() {
         for(Sight s : SightDap.INSTANCE.getModel()) {
             File dirFile = new File(s.getmFolderPath());
+            if(!dirFile.exists())
+            {
+                dirFile.mkdirs();
+            }
             s.setmNumPics(dirFile.list().length);
         }
     }

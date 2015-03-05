@@ -200,6 +200,11 @@ public class NewSightActivity extends FragmentActivity implements
         mCurrentSight.setmSiteFencePoly(geoFencePolygonPoints);
         mCurrentSight.setmLastUpdated(Calendar.getInstance().getTime());
 
+        if(mCurrentSight.getmSiteName().isEmpty())
+        {
+            noNamePopup();
+            return;
+        }
         if(geoFencePolygonPoints.size() <= 2)
         {
             noFensePopup();
@@ -407,6 +412,22 @@ public class NewSightActivity extends FragmentActivity implements
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Notice");
         builder.setMessage("Sight name must be unique");
+
+        // Set up the buttons
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+
+        builder.show();
+    }
+
+    private void noNamePopup() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Notice");
+        builder.setMessage("Sight must have a name");
 
         // Set up the buttons
         builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {

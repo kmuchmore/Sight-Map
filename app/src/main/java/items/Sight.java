@@ -167,6 +167,7 @@ public class Sight implements Parcelable {
     }
 
     public void setmSiteName(String mSiteName) {
+        mSiteName = mSiteName.replaceAll("\\s+$", "");
         this.mSiteName = mSiteName;
     }
 
