@@ -11,8 +11,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
 
+import com.google.android.gms.maps.model.LatLng;
+import com.google.maps.android.PolyUtil;
+
 import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
 
 import items.Sight;
 import items.SightDap;
@@ -21,8 +25,7 @@ import utils.SightArrayAdapter;
 /**
  * Created by Kyle on 1/20/2015.
  */
-public class ManageActivity extends Activity
-{
+public class ManageActivity extends Activity {
     public static final int NEW_SIGHT_REQUEST = 1;
     public static final String PAR_KEY = "com.kwmuch.kyle.sightmap.spar";
     SightArrayAdapter adapter = null;
@@ -30,8 +33,7 @@ public class ManageActivity extends Activity
     ListView sightListView = null;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState)
-    {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_manage);
 
@@ -46,8 +48,7 @@ public class ManageActivity extends Activity
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item)
-    {
+    public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             // Respond to the action bar's Up/Home button
             case android.R.id.home:
@@ -58,8 +59,7 @@ public class ManageActivity extends Activity
         return super.onOptionsItemSelected(item);
     }
 
-    public void newSight(View v)
-    {
+    public void newSight(View v) {
         Sight sendSight = new Sight();
         Intent ns = new Intent(ManageActivity.this, NewSightActivity.class);
         Bundle sendBundle = new Bundle();
@@ -70,8 +70,7 @@ public class ManageActivity extends Activity
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data)
-    {
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == RESULT_OK && requestCode == NEW_SIGHT_REQUEST) {
             Sight retSight = (Sight) data.getParcelableExtra(ManageActivity.PAR_KEY);
             Log.w("Locations", "Got sight back");
@@ -85,17 +84,34 @@ public class ManageActivity extends Activity
             if (loc != -1) {
                 mDataList.set(loc, retSight);
                 SightDap.INSTANCE.updateFile();
-            }
-            else {
-                mDataList.add(retSight);
-                adapter.notifyDataSetChanged();
+            } else {
+                for (int i = 0; i < SightDap.INSTANCE.getModel().size(); i++) {
+                    boolean isSubPoly = true;
+                    List<LatLng> compareFence = SightDap.INSTANCE.getModel().get(i).getmSiteFencePoly();
+                    for (int j = 0; j < retSight.getmSiteFencePoly().size() && isSubPoly; j++) {
+                        LatLng comparePoint = retSight.getmSiteFencePoly().get(j);
+                        if (!PolyUtil.containsLocation(comparePoint, compareFence, false)) {
+                            isSubPoly = false;
+                        }
+                    }
+                    if (isSubPoly) {
+                        loc = i;
+                    }
+                }
+                if (loc != -1) {
+                    mDataList.add(loc, retSight);
+                    sightListView.setAdapter(adapter);
+                    adapter.notifyDataSetChanged();
+                } else {
+                    mDataList.add(retSight);
+                    adapter.notifyDataSetChanged();
+                }
                 SightDap.INSTANCE.updateFile();
             }
         }
     }
 
-    public void deleteSight(View view)
-    {
+    public void deleteSight(View view) {
         int rmSightIndex = ((Integer) view.getTag());
         Sight rmSight = adapter.getItem(rmSightIndex);
 
@@ -107,15 +123,13 @@ public class ManageActivity extends Activity
         Sight rmSight = adapter.getItem(rmSightIndex);
 
         File dir = new File(rmSight.getmFolderPath());
-        if(dir.isDirectory())
-        {
+        if (dir.isDirectory()) {
             String[] children = dir.list();
             for (int i = 0; i < children.length; i++) {
                 new File(dir, children[i]).delete();
             }
         }
-        if(!dir.delete())
-        {
+        if (!dir.delete()) {
             Log.w("Process", "Delete Failed");
         }
 
@@ -146,5 +160,10 @@ public class ManageActivity extends Activity
         });
 
         builder.show();
+    }
+
+    private boolean isSubPolygon() {
+
+        return false;
     }
 }
