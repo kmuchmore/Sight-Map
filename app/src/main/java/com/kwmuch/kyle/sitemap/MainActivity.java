@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import items.Sight;
@@ -204,7 +205,12 @@ public class MainActivity extends Activity implements
     }
 
     private File createImageFile(Sight s) {
-        String fileName = String.format("%03d", s.getmIttVal());
+        String fileName = s.getmSiteName();
+        Date today = Calendar.getInstance().getTime();
+        if(!isSameDay(DateToCalendar(today), DateToCalendar(s.getmLastUpdated()))) {
+            s.setmIttVal(1);
+        }
+        fileName = fileName + String.format("_%03d", s.getmIttVal());
 
         if(addDate) {
             SimpleDateFormat sdf = new SimpleDateFormat("MM-dd-yyyy");
@@ -256,5 +262,20 @@ public class MainActivity extends Activity implements
             }
             s.setmNumPics(dirFile.list().length);
         }
+    }
+
+    public static boolean isSameDay(Calendar cal1, Calendar cal2) {
+        if (cal1 == null || cal2 == null) {
+            throw new IllegalArgumentException("The dates must not be null");
+        }
+        return (cal1.get(Calendar.ERA) == cal2.get(Calendar.ERA) &&
+                cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR) &&
+                cal1.get(Calendar.DAY_OF_YEAR) == cal2.get(Calendar.DAY_OF_YEAR));
+    }
+
+    public static Calendar DateToCalendar(Date date){
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        return cal;
     }
 }

@@ -99,6 +99,7 @@ public class ManageActivity extends Activity {
                     }
                 }
                 if (loc != -1) {
+                    subSightPopup(SightDap.INSTANCE.getModel().get(loc), retSight);
                     mDataList.add(loc, retSight);
                     sightListView.setAdapter(adapter);
                     adapter.notifyDataSetChanged();
@@ -143,7 +144,7 @@ public class ManageActivity extends Activity {
     private void deleteSightDialog(String sightName, final View view) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Are you sure?");
-        builder.setMessage("This will delete all images associated with this sight");
+        builder.setMessage("--BACKUP YOUR DATA--\nThis will delete all images associated with this sight");
 
         // Set up the buttons
         builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
@@ -165,5 +166,21 @@ public class ManageActivity extends Activity {
     private boolean isSubPolygon() {
 
         return false;
+    }
+
+    private void subSightPopup(Sight pSight, Sight cSight) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Notice");
+        builder.setMessage(cSight.getmSiteName() + " is a Sub-Sight of " + pSight.getmSiteName() + " and has been sorted by " + pSight.getmSiteName());
+
+        // Set up the buttons
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+
+        builder.show();
     }
 }
