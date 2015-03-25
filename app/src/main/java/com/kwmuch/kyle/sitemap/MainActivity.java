@@ -88,7 +88,8 @@ public class MainActivity extends Activity implements
 
         switch (id) {
             case R.id.action_settings:
-                return true;
+                openSettingView();
+                break;
             case R.id.manage_site:
                 openManageView();
                 break;
@@ -114,6 +115,10 @@ public class MainActivity extends Activity implements
 
     private void openManageView() {
         startActivity(new Intent(MainActivity.this, ManageActivity.class));
+    }
+
+    private void openSettingView() {
+        startActivity(new Intent(MainActivity.this, SettingsActivity.class));
     }
 
     private void takePicture() {
