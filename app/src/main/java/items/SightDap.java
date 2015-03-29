@@ -20,7 +20,8 @@ import java.util.List;
 /**
  * Created by Kyle on 2/22/2015.
  */
-public enum SightDap
+public enum
+        SightDap
 {
     INSTANCE;
     private static Context c;

@@ -2,11 +2,11 @@ package com.kwmuch.kyle.sitemap;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.graphics.Bitmap;
+import android.content.SharedPreferences;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
+import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.Menu;
@@ -22,8 +22,6 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.maps.android.PolyUtil;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -47,7 +45,6 @@ public class MainActivity extends Activity implements
     boolean mIsReqLocUpdates = false;
     private Location mCurrentLocation = null;
     private LocationRequest mLocReq = null;
-    private Boolean addDate = true;
     SightArrayAdapter adapter = null;
 
     public static int getNewID() {
@@ -212,7 +209,11 @@ public class MainActivity extends Activity implements
     private File createImageFile(Sight s) {
         String fileName = s.getmSiteName();
         Date today = Calendar.getInstance().getTime();
-        if(!isSameDay(DateToCalendar(today), DateToCalendar(s.getmLastUpdated()))) {
+
+        SharedPreferences getPrefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+        boolean addDate = getPrefs.getBoolean("filename_date_checkbox", true);
+
+        if(addDate && !isSameDay(DateToCalendar(today), DateToCalendar(s.getmLastUpdated()))) {
             s.setmIttVal(1);
         }
         fileName = fileName + String.format("_%03d", s.getmIttVal());
