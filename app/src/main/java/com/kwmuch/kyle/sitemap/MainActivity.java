@@ -224,6 +224,11 @@ public class MainActivity extends Activity implements
             int index = SightDap.INSTANCE.getModel().indexOf(s);
             SightDap.INSTANCE.getModel().get(index).setmLastUpdated(Calendar.getInstance().getTime());
         }
+        else {
+            fileName = fileName + ".jpg";
+            int index = SightDap.INSTANCE.getModel().indexOf(s);
+            SightDap.INSTANCE.getModel().get(index).setmLastUpdated(Calendar.getInstance().getTime());
+         }
 
         File fileDir = new File(s.getmFolderPath());
         File fileOut = new File(fileDir, fileName);
