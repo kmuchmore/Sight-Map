@@ -11,6 +11,8 @@ import android.provider.MediaStore;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -46,6 +48,12 @@ public class MainActivity extends Activity implements
     private Location mCurrentLocation = null;
     private LocationRequest mLocReq = null;
     SightArrayAdapter adapter = null;
+    private AdapterView.OnItemClickListener mItemClickedHandler = new AdapterView.OnItemClickListener() {
+        public void onItemClick(AdapterView parent, View v, int position, long id) {
+            Log.w("Process", "Position: " + position + " id: " + id);
+            takePicture(position);
+        }
+    };
 
     public static int getNewID() {
         idCount++;
@@ -63,6 +71,7 @@ public class MainActivity extends Activity implements
 
         ListView sightListView = (ListView) findViewById(R.id.sightList);
         sightListView.setAdapter(adapter);
+        sightListView.setOnItemClickListener(mItemClickedHandler);
 
         buildGoogleApiClient();
         createLocationRequest();
@@ -91,7 +100,7 @@ public class MainActivity extends Activity implements
                 openManageView();
                 break;
             case R.id.capture_image:
-                takePicture();
+                takePicture(null);
         }
         return super.onOptionsItemSelected(item);
     }
@@ -118,13 +127,13 @@ public class MainActivity extends Activity implements
         startActivity(new Intent(MainActivity.this, SettingsActivity.class));
     }
 
-    private void takePicture() {
+    private void takePicture(Integer position) {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
 
             File photoFile = null;
             try {
-                photoFile = prepForImageCapture();
+                photoFile = prepForImageCapture(position);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -236,17 +245,24 @@ public class MainActivity extends Activity implements
         return fileOut;
     }
 
-    private File prepForImageCapture() throws IOException {
+    private File prepForImageCapture(Integer position) throws IOException {
         Sight newImageSight = null;
         LatLng ll = null;
         if(mCurrentLocation != null)
         {
-            ll = new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude());
-            for (Sight s : SightDap.INSTANCE.getModel()) {
-                if (PolyUtil.containsLocation(ll, s.getmSiteFencePoly(), false)) {
-                    newImageSight = s;
-                    break;
+            if(position == null)
+            {
+                ll = new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude());
+                for (Sight s : SightDap.INSTANCE.getModel()) {
+                    if (PolyUtil.containsLocation(ll, s.getmSiteFencePoly(), false)) {
+                        newImageSight = s;
+                        break;
+                    }
                 }
+            }
+            else
+            {
+                newImageSight = SightDap.INSTANCE.getModel().get(position);
             }
             if(newImageSight == null)
             {
@@ -288,5 +304,10 @@ public class MainActivity extends Activity implements
         Calendar cal = Calendar.getInstance();
         cal.setTime(date);
         return cal;
+    }
+
+    public void testClick(View view) {
+        int loc = view.getId();
+        Log.w("Process", "Test" + loc);
     }
 }
