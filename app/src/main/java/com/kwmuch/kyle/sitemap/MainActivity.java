@@ -2,15 +2,17 @@ package com.kwmuch.kyle.sitemap;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.graphics.Bitmap;
+import android.content.SharedPreferences;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
+import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -22,12 +24,11 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.maps.android.PolyUtil;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import items.Sight;
@@ -46,8 +47,13 @@ public class MainActivity extends Activity implements
     boolean mIsReqLocUpdates = false;
     private Location mCurrentLocation = null;
     private LocationRequest mLocReq = null;
-    private Boolean addDate = true;
     SightArrayAdapter adapter = null;
+    private AdapterView.OnItemClickListener mItemClickedHandler = new AdapterView.OnItemClickListener() {
+        public void onItemClick(AdapterView parent, View v, int position, long id) {
+            Log.w("Process", "Position: " + position + " id: " + id);
+            takePicture(position);
+        }
+    };
 
     public static int getNewID() {
         idCount++;
@@ -65,6 +71,7 @@ public class MainActivity extends Activity implements
 
         ListView sightListView = (ListView) findViewById(R.id.sightList);
         sightListView.setAdapter(adapter);
+        sightListView.setOnItemClickListener(mItemClickedHandler);
 
         buildGoogleApiClient();
         createLocationRequest();
@@ -87,12 +94,17 @@ public class MainActivity extends Activity implements
 
         switch (id) {
             case R.id.action_settings:
-                return true;
+                openSettingView();
+                break;
             case R.id.manage_site:
                 openManageView();
                 break;
             case R.id.capture_image:
-                takePicture();
+
+
+
+
+                takePicture(null);
         }
         return super.onOptionsItemSelected(item);
     }
@@ -115,13 +127,17 @@ public class MainActivity extends Activity implements
         startActivity(new Intent(MainActivity.this, ManageActivity.class));
     }
 
-    private void takePicture() {
+    private void openSettingView() {
+        startActivity(new Intent(MainActivity.this, SettingsActivity.class));
+    }
+
+    private void takePicture(Integer position) {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
 
             File photoFile = null;
             try {
-                photoFile = prepForImageCapture();
+                photoFile = prepForImageCapture(position);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -168,6 +184,7 @@ public class MainActivity extends Activity implements
         if (mGoogleApiClient.isConnected() && !mIsReqLocUpdates) {
             startLocationUpdates();
         }
+        updateFileNums();
     }
 
     @Override
@@ -203,39 +220,17 @@ public class MainActivity extends Activity implements
         Log.w("Setup", "Connection has failed");
     }
 
-//    private boolean isExternalStorageReadable() {
-//        String state = Environment.getExternalStorageState();
-//        if (Environment.MEDIA_MOUNTED.equals(state) || Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)) {
-//            return true;
-//        }
-//        return false;
-//    }
-
-//    private boolean isExternalStorageWritable() {
-//        String state = Environment.getExternalStorageState();
-//        if (Environment.MEDIA_MOUNTED.equals(state)) {
-//            return true;
-//        }
-//        return false;
-//    }
-//
-//    private File getSightStorageDir(String sightName) {
-//        String dirPath = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).toString() + "/Sight Map";
-//
-//        File file = new File(dirPath, sightName);
-//        if(!isExternalStorageWritable()) {
-//            Log.w("Setup", "SD Card is not writable");
-//        }
-//        if(!file.exists()) {
-//            if (!file.mkdirs()) {
-//                Log.w("Setup", "Could not create path to " + file.getAbsolutePath());
-//            }
-//        }
-//        return file;
-//    }
-
     private File createImageFile(Sight s) {
-        String fileName = String.format("%03d", s.getmIttVal());
+        String fileName = s.getmSiteName();
+        Date today = Calendar.getInstance().getTime();
+
+        SharedPreferences getPrefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+        boolean addDate = getPrefs.getBoolean("filename_date_checkbox", true);
+
+        if(addDate && !isSameDay(DateToCalendar(today), DateToCalendar(s.getmLastUpdated()))) {
+            s.setmIttVal(1);
+        }
+        fileName = fileName + String.format("_%03d", s.getmIttVal());
 
         if(addDate) {
             SimpleDateFormat sdf = new SimpleDateFormat("MM-dd-yyyy");
@@ -243,31 +238,46 @@ public class MainActivity extends Activity implements
             int index = SightDap.INSTANCE.getModel().indexOf(s);
             SightDap.INSTANCE.getModel().get(index).setmLastUpdated(Calendar.getInstance().getTime());
         }
+        else {
+            fileName = fileName + ".jpg";
+            int index = SightDap.INSTANCE.getModel().indexOf(s);
+            SightDap.INSTANCE.getModel().get(index).setmLastUpdated(Calendar.getInstance().getTime());
+         }
 
-//        File fileDir = getSightStorageDir(s.getmSiteName());
         File fileDir = new File(s.getmFolderPath());
         File fileOut = new File(fileDir, fileName);
 
         return fileOut;
     }
 
-    private File prepForImageCapture() throws IOException {
+    private File prepForImageCapture(Integer position) throws IOException {
         Sight newImageSight = null;
         LatLng ll = null;
         if(mCurrentLocation != null)
         {
-            ll = new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude());
-            for (Sight s : SightDap.INSTANCE.getModel()) {
-                if (PolyUtil.containsLocation(ll, s.getmSiteFencePoly(), false)) {
-                    newImageSight = s;
-                    break;
+            if(position == null)
+            {
+                ll = new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude());
+                for (Sight s : SightDap.INSTANCE.getModel()) {
+                    if (PolyUtil.containsLocation(ll, s.getmSiteFencePoly(), false)) {
+                        newImageSight = s;
+                        break;
+                    }
                 }
+            }
+            else
+            {
+                newImageSight = SightDap.INSTANCE.getModel().get(position);
+            }
+            if(newImageSight == null)
+            {
+                newImageSight = SightDap.INSTANCE.getModel().get(0);
             }
             String imageSight = newImageSight.getmSiteName();
         }
         else {
-//            newImageSight =
-            //@TODO Figure out how to initialize this
+            newImageSight = SightDap.INSTANCE.getModel().get(0);
+            String imageSight = newImageSight.getmSiteName();
         }
 
         File imageFile = createImageFile(newImageSight);
@@ -278,26 +288,31 @@ public class MainActivity extends Activity implements
     private void updateFileNums() {
         for(Sight s : SightDap.INSTANCE.getModel()) {
             File dirFile = new File(s.getmFolderPath());
+            if(!dirFile.exists())
+            {
+                dirFile.mkdirs();
+            }
             s.setmNumPics(dirFile.list().length);
         }
     }
 
-//    private boolean saveImageToFile(File imageFile, Bitmap imageBitmap) {
-//        boolean success = false;
-//        FileOutputStream fos = null;
-//
-//        try {
-//            fos = new FileOutputStream(imageFile);
-//            imageBitmap.compress(Bitmap.CompressFormat.PNG, 100, fos);
-//
-//            fos.flush();
-//            fos.close();
-//            success = true;
-//        } catch (FileNotFoundException e) {
-//            e.printStackTrace();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//        return success;
-//    }
+    public static boolean isSameDay(Calendar cal1, Calendar cal2) {
+        if (cal1 == null || cal2 == null) {
+            throw new IllegalArgumentException("The dates must not be null");
+        }
+        return (cal1.get(Calendar.ERA) == cal2.get(Calendar.ERA) &&
+                cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR) &&
+                cal1.get(Calendar.DAY_OF_YEAR) == cal2.get(Calendar.DAY_OF_YEAR));
+    }
+
+    public static Calendar DateToCalendar(Date date){
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        return cal;
+    }
+
+    public void testClick(View view) {
+        int loc = view.getId();
+        Log.w("Process", "Test" + loc);
+    }
 }

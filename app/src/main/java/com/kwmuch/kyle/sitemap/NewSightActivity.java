@@ -1,6 +1,7 @@
 package com.kwmuch.kyle.sitemap;
 
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -199,7 +200,23 @@ public class NewSightActivity extends FragmentActivity implements
         mCurrentSight.setmSiteFencePoly(geoFencePolygonPoints);
         mCurrentSight.setmLastUpdated(Calendar.getInstance().getTime());
 
-        mCurrentSight.setmFolderPath(getSightStorageDir(mCurrentSight.getmSiteName()).toString());
+        if(mCurrentSight.getmSiteName().isEmpty())
+        {
+            noNamePopup();
+            return;
+        }
+        if(geoFencePolygonPoints.size() <= 2)
+        {
+            noFensePopup();
+            return;
+        }
+        File saveFile = getSightStorageDir(mCurrentSight.getmSiteName());
+        if(saveFile == null)
+        {
+            uniqueNamePopup();
+            return;
+        }
+        mCurrentSight.setmFolderPath(saveFile.toString());
 
         int resultCode = ManageActivity.NEW_SIGHT_REQUEST;
         Bundle cb = new Bundle();
@@ -250,7 +267,8 @@ public class NewSightActivity extends FragmentActivity implements
     private void updateMapLocation() {
         CameraPosition update = new CameraPosition.Builder()
                 .target(new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude()))
-                .zoom(13.9f)
+                .zoom(16.0f)
+//                .zoom(13.9f)
                 .build();
         mMap.animateCamera(CameraUpdateFactory.newCameraPosition(update));
     }
@@ -388,5 +406,53 @@ public class NewSightActivity extends FragmentActivity implements
             return true;
         }
         return false;
+    }
+
+    private void uniqueNamePopup() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Notice");
+        builder.setMessage("Sight name must be unique");
+
+        // Set up the buttons
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+
+        builder.show();
+    }
+
+    private void noNamePopup() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Notice");
+        builder.setMessage("Sight must have a name");
+
+        // Set up the buttons
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+
+        builder.show();
+    }
+
+    private void noFensePopup() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Notice");
+        builder.setMessage("Please place sight boundaries");
+
+        // Set up the buttons
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+
+        builder.show();
     }
 }

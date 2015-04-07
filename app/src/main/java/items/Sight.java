@@ -60,7 +60,7 @@ public class Sight implements Parcelable {
         this.mLastUpdated = Calendar.getInstance().getTime();
         this.mFolderPath = null;
         this.mNumPics = 0;
-        this.mIttVal = 0;
+        this.mIttVal = 1;
     }
 
     public Sight(int id) {
@@ -70,7 +70,7 @@ public class Sight implements Parcelable {
         this.mLastUpdated = Calendar.getInstance().getTime();
         this.mFolderPath = null;
         this.mNumPics = 0;
-        this.mIttVal = 0;
+        this.mIttVal = 1;
     }
 
     public Sight(String mSiteName) {
@@ -80,7 +80,7 @@ public class Sight implements Parcelable {
         this.mLastUpdated = Calendar.getInstance().getTime();
         this.mFolderPath = null;
         this.mNumPics = 0;
-        this.mIttVal = 0;
+        this.mIttVal = 1;
     }
 
     public Sight(Parcel in) {
@@ -167,6 +167,7 @@ public class Sight implements Parcelable {
     }
 
     public void setmSiteName(String mSiteName) {
+        mSiteName = mSiteName.replaceAll("\\s+$", "");
         this.mSiteName = mSiteName;
     }
 

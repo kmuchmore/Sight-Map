@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android = "http://schemas.android.com/apk/res/android"
                 android:layout_width = "match_parent"
-                android:layout_height = "match_parent">
+                android:layout_height = "match_parent"
+                android:descendantFocusability="blocksDescendants">
 
     <TextView
         android:id = "@+id/sight_title"
@@ -26,7 +27,7 @@
         android:id = "@+id/num_photos"
         android:layout_width = "wrap_content"
         android:layout_height = "wrap_content"
-        android:text = "1337 photos"
+        android:text = "0000 photos"
         android:paddingLeft="10sp"
         android:layout_below = "@+id/sight_title"
         android:layout_alignParentLeft = "@+id/sight_title"

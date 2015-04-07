@@ -9,6 +9,7 @@ import com.kwmuch.kyle.sitemap.NewSightActivity;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -19,7 +20,8 @@ import java.util.List;
 /**
  * Created by Kyle on 2/22/2015.
  */
-public enum SightDap
+public enum
+        SightDap
 {
     INSTANCE;
     private static Context c;
@@ -52,9 +54,11 @@ public enum SightDap
             e.printStackTrace();
             Log.w("Setup", "File not found");
             Sight unknownSight = new Sight("Unknown Sight");
-            String dirName = NewSightActivity.getSightStorageDir(unknownSight.getmSiteName()).toString();
+            File unknownFile = NewSightActivity.getSightStorageDir(unknownSight.getmSiteName());
+            String dirName = unknownFile.toString();
             unknownSight.setmFolderPath(dirName);
             SightDap.INSTANCE.getModel().add(unknownSight);
+            SightDap.INSTANCE.updateFile();
         }
     }
 
