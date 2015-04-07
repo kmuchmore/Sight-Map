@@ -100,6 +100,10 @@ public class MainActivity extends Activity implements
                 openManageView();
                 break;
             case R.id.capture_image:
+
+
+
+
                 takePicture(null);
         }
         return super.onOptionsItemSelected(item);
@@ -180,6 +184,7 @@ public class MainActivity extends Activity implements
         if (mGoogleApiClient.isConnected() && !mIsReqLocUpdates) {
             startLocationUpdates();
         }
+        updateFileNums();
     }
 
     @Override
