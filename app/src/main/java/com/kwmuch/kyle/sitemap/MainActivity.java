@@ -3,6 +3,8 @@ package com.kwmuch.kyle.sitemap;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.ContentObservable;
+import android.database.ContentObserver;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
@@ -30,6 +32,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.logging.Handler;
 
 import items.Sight;
 import items.SightDap;
@@ -48,6 +51,22 @@ public class MainActivity extends Activity implements
     private Location mCurrentLocation = null;
     private LocationRequest mLocReq = null;
     SightArrayAdapter adapter = null;
+    ContentObserver co;
+
+    private class ObserverWithListener extends ContentObserver {
+        private final OnChangeListener mListener;
+
+        /**
+         * Creates a content observer.
+         *
+         * @param handler The handler to run {@link #onChange} on, or null if none.
+         */
+        public ObserverWithListener(android.os.Handler handler) {
+            super(handler);
+        }
+    }
+
+
     private AdapterView.OnItemClickListener mItemClickedHandler = new AdapterView.OnItemClickListener() {
         public void onItemClick(AdapterView parent, View v, int position, long id) {
             Log.w("Process", "Position: " + position + " id: " + id);
@@ -111,6 +130,8 @@ public class MainActivity extends Activity implements
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Log.w("Process", "Request Code: " + requestCode);
+        Log.w("Process", "Result Code: " + resultCode);
         if (requestCode == REQUEST_TAKE_PHOTO && resultCode == RESULT_OK) {
             Log.w("Process", "Took image");
             updateFileNums();
@@ -131,8 +152,9 @@ public class MainActivity extends Activity implements
         startActivity(new Intent(MainActivity.this, SettingsActivity.class));
     }
 
+//    MediaStore.ACTION_IMAGE_CAPTURE
     private void takePicture(Integer position) {
-        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        Intent takePictureIntent = new Intent(MediaStore.INTENT_ACTION_STILL_IMAGE_CAMERA);
         if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
 
             File photoFile = null;
