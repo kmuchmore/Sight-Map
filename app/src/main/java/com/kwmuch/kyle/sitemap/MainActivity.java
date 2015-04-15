@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.ContentObservable;
 import android.database.ContentObserver;
+import android.database.Cursor;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
@@ -46,6 +47,7 @@ public class MainActivity extends Activity implements
 
     static final int REQUEST_TAKE_PHOTO = 1;
     static int idCount = 0;
+    static int image_count_before;
     public GoogleApiClient mGoogleApiClient = null;
     boolean mIsReqLocUpdates = false;
     private Location mCurrentLocation = null;
@@ -53,17 +55,16 @@ public class MainActivity extends Activity implements
     SightArrayAdapter adapter = null;
     ContentObserver co;
 
-    private class ObserverWithListener extends ContentObserver {
-        private final OnChangeListener mListener;
+    public Cursor loadCursor() {
 
-        /**
-         * Creates a content observer.
-         *
-         * @param handler The handler to run {@link #onChange} on, or null if none.
-         */
-        public ObserverWithListener(android.os.Handler handler) {
-            super(handler);
-        }
+        final String[] columns = { MediaStore.Images.Media.DATA,
+                MediaStore.Images.Media._ID };
+
+        final String orderBy = MediaStore.Images.Media.DATE_ADDED;
+
+        return getContentResolver().query(
+                MediaStore.Images.Media.EXTERNAL_CONTENT_URI, columns, null,
+                null, orderBy);
     }
 
 
@@ -132,8 +133,12 @@ public class MainActivity extends Activity implements
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         Log.w("Process", "Request Code: " + requestCode);
         Log.w("Process", "Result Code: " + resultCode);
-        if (requestCode == REQUEST_TAKE_PHOTO && resultCode == RESULT_OK) {
+
+        if (requestCode == REQUEST_TAKE_PHOTO) {
             Log.w("Process", "Took image");
+
+            exitingCamera();
+
             updateFileNums();
             adapter.notifyDataSetChanged();
             SightDap.INSTANCE.updateFile();
@@ -154,20 +159,65 @@ public class MainActivity extends Activity implements
 
 //    MediaStore.ACTION_IMAGE_CAPTURE
     private void takePicture(Integer position) {
-        Intent takePictureIntent = new Intent(MediaStore.INTENT_ACTION_STILL_IMAGE_CAMERA);
-        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+        Cursor cursor = loadCursor();
 
-            File photoFile = null;
-            try {
-                photoFile = prepForImageCapture(position);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            if(photoFile != null) {
-                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(photoFile));
-                startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
-            }
+        image_count_before = cursor.getCount();
+
+        cursor.close();
+
+        Intent takePictureIntent = new Intent(MediaStore.INTENT_ACTION_STILL_IMAGE_CAMERA);
+
+        startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
+
+//        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+//
+//            File photoFile = null;
+//            try {
+//                photoFile = prepForImageCapture(position);
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//            if(photoFile != null) {
+//                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(photoFile));
+//                startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
+//            }
+//        }
+    }
+
+    public String[] getImagePaths(Cursor cursor, int startPosition) {
+
+        int size = cursor.getCount() - startPosition;
+
+        if (size <= 0)
+            return null;
+
+        String[] paths = new String[size];
+
+        int dataColumnIndex = cursor
+                .getColumnIndex(MediaStore.Images.Media.DATA);
+
+        for (int i = startPosition; i < cursor.getCount(); i++) {
+
+            cursor.moveToPosition(i);
+
+            paths[i - startPosition] = cursor.getString(dataColumnIndex);
         }
+
+        return paths;
+    }
+
+    private void exitingCamera() {
+
+        Cursor cursor = loadCursor();
+        String[] paths = getImagePaths(cursor, image_count_before);
+        cursor.close();
+        processNewImages(paths);
+//        new ProcessImage(paths).execute();
+
+    }
+
+    private void processNewImages(String[] paths){
+
     }
 
     protected synchronized void buildGoogleApiClient() {
