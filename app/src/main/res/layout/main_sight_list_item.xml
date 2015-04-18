@@ -39,7 +39,8 @@
         android:layout_height = "wrap_content"
         android:src="@drawable/ic_action_picture"
         android:layout_alignTop = "@+id/sight_title"
-        android:layout_alignParentEnd = "true" />
+        android:layout_alignParentEnd = "true"
+        android:onClick="viewImages" />
 
     <TextView
         android:layout_width="wrap_content"

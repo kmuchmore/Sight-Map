@@ -1,6 +1,8 @@
 package utils;
 
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -41,6 +43,7 @@ public class SightArrayAdapter extends ArrayAdapter<Sight> {
                 case R.layout.main_sight_list_item:
                     sightHolder.numPics = (TextView) convertView.findViewById(R.id.num_photos);
                     sightHolder.viewCollectionBtn = (ImageButton) convertView.findViewById(R.id.view_collections);
+                    sightHolder.viewCollectionBtn.setTag(new Integer(position));
                     sightHolder.date = (TextView) convertView.findViewById(R.id.date_updated);
                     break;
                 case R.layout.manage_sight_list_item:
