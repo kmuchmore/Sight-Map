@@ -48,7 +48,7 @@ public class SightArrayAdapter extends ArrayAdapter<Sight> {
                     break;
                 case R.layout.manage_sight_list_item:
                     sightHolder.editBtn = (ImageButton) convertView.findViewById(R.id.edit_sight);
-                    sightHolder.editBtn.setTag(sightHolder.sight);
+                    sightHolder.editBtn.setTag(new Integer(position));
                     sightHolder.deleteBtn = (ImageButton) convertView.findViewById(R.id.delete_sight);
                     sightHolder.deleteBtn.setTag(new Integer(position));
                     break;

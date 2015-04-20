@@ -83,6 +83,8 @@ public class NewSightActivity extends FragmentActivity implements
         setContentView(R.layout.activity_new_sight);
 
         mCurrentSight = (Sight)getIntent().getParcelableExtra(ManageActivity.PAR_KEY);
+//        mSightName.setText(mCurrentSight.getmSiteName());
+//        geoFencePolygonPoints = (ArrayList<LatLng>) mCurrentSight.getmSiteFencePoly();
 
         mMapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.gMap);
         mMapFragment.getMapAsync(this);
@@ -108,8 +110,10 @@ public class NewSightActivity extends FragmentActivity implements
             }
         } );
 
+        mSightName.setText(mCurrentSight.getmSiteName());
         mAddGeoFenceButton = (Button) findViewById(R.id.addGeoFence);
-        geoFencePolygonPoints = new ArrayList<LatLng>();
+        geoFencePolygonPoints = (ArrayList<LatLng>) mCurrentSight.getmSiteFencePoly();
+//        geoFencePolygonPoints = new ArrayList<LatLng>();
 
         buildGoogleApiClient();
         createLocationRequest();
@@ -146,6 +150,11 @@ public class NewSightActivity extends FragmentActivity implements
 //        mMap.setOnMapLongClickListener(this);
         mMap.setOnMapClickListener(this);
         mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
+
+        if(!geoFencePolygonPoints.isEmpty())
+        {
+            drawPolygonGeoFence();
+        }
     }
 
     protected synchronized void buildGoogleApiClient() {
