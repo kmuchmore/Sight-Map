@@ -119,6 +119,18 @@ public class ManageActivity extends Activity {
         deleteSightDialog(rmSight.getmSiteName(), view);
     }
 
+    public void editSight(View view) {
+        int editSightIndex = ((Integer) view.getTag());
+        Sight editSight = adapter.getItem(editSightIndex);
+
+        Intent ns = new Intent(ManageActivity.this, NewSightActivity.class);
+        Bundle sendBundle = new Bundle();
+        sendBundle.putParcelable(PAR_KEY, editSight);
+        ns.putExtras(sendBundle);
+
+        startActivityForResult(ns, NEW_SIGHT_REQUEST);
+    }
+
     private void processDeleteSight(View view) {
         int rmSightIndex = ((Integer) view.getTag());
         Sight rmSight = adapter.getItem(rmSightIndex);

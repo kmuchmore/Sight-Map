@@ -3,9 +3,13 @@ package com.kwmuch.kyle.sitemap;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.ContentObserver;
+import android.database.Cursor;
 import android.location.Location;
+import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -24,7 +28,9 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.maps.android.PolyUtil;
 
 import java.io.File;
-import java.io.IOException;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.nio.channels.FileChannel;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -43,11 +49,27 @@ public class MainActivity extends Activity implements
 
     static final int REQUEST_TAKE_PHOTO = 1;
     static int idCount = 0;
+    static int image_count_before;
+    static Integer tempLocHolder = null;
     public GoogleApiClient mGoogleApiClient = null;
     boolean mIsReqLocUpdates = false;
     private Location mCurrentLocation = null;
     private LocationRequest mLocReq = null;
     SightArrayAdapter adapter = null;
+    ContentObserver co;
+
+    public Cursor loadCursor() {
+
+        final String[] columns = { MediaStore.Images.Media.DATA,
+                MediaStore.Images.Media._ID };
+
+        final String orderBy = MediaStore.Images.Media.DATE_ADDED;
+
+        return getContentResolver().query(
+                MediaStore.Images.Media.EXTERNAL_CONTENT_URI, columns, null,
+                null, orderBy);
+    }
+
     private AdapterView.OnItemClickListener mItemClickedHandler = new AdapterView.OnItemClickListener() {
         public void onItemClick(AdapterView parent, View v, int position, long id) {
             Log.w("Process", "Position: " + position + " id: " + id);
@@ -111,8 +133,18 @@ public class MainActivity extends Activity implements
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_TAKE_PHOTO && resultCode == RESULT_OK) {
+        Log.w("Process", "Request Code: " + requestCode);
+        Log.w("Process", "Result Code: " + resultCode);
+
+        Log.w("Process", "LocHolder: " + tempLocHolder);
+
+        if (requestCode == REQUEST_TAKE_PHOTO) {
             Log.w("Process", "Took image");
+
+            exitingCamera(tempLocHolder);
+
+            tempLocHolder = null;
+
             updateFileNums();
             adapter.notifyDataSetChanged();
             SightDap.INSTANCE.updateFile();
@@ -131,21 +163,189 @@ public class MainActivity extends Activity implements
         startActivity(new Intent(MainActivity.this, SettingsActivity.class));
     }
 
+//    MediaStore.ACTION_IMAGE_CAPTURE
     private void takePicture(Integer position) {
-        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+        Cursor cursor = loadCursor();
+        image_count_before = cursor.getCount();
+        cursor.close();
 
-            File photoFile = null;
-            try {
-                photoFile = prepForImageCapture(position);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            if(photoFile != null) {
-                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(photoFile));
-                startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
-            }
+        tempLocHolder = position;
+
+        Intent takePictureIntent = new Intent(MediaStore.INTENT_ACTION_STILL_IMAGE_CAMERA);
+
+        startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
+
+//        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+//
+//            File photoFile = null;
+//            try {
+//                photoFile = prepForImageCapture(position);
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//            if(photoFile != null) {
+//                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(photoFile));
+//                startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
+//            }
+//        }
+    }
+
+    public void viewImages(View view) {
+        int viewSightNum = ((Integer) view.getTag());
+        Sight viewSight = adapter.getItem(viewSightNum);
+
+        Intent galleryIntent = new Intent(
+                Intent.ACTION_PICK,
+                android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        startActivity(galleryIntent);
+
+//        Intent intent = new Intent(Intent.ACTION_VIEW);
+//        File dirFile = new File(viewSight.getmFolderPath());
+//        File dirFile = new File("/storage/emulated/0/Pictures/Sight Map/Unknown Sight/*");
+//        Log.w("Process", dirFile.getAbsolutePath());
+//        intent.setDataAndType(Uri.parse(dirFile.getAbsolutePath()), "image/*");
+//        intent.setType("images/*");
+//        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//        startActivity(intent);
+    }
+
+    public String[] getImagePaths(Cursor cursor, int startPosition) {
+
+        int size = cursor.getCount() - startPosition;
+
+        if (size <= 0)
+            return null;
+
+        String[] paths = new String[size];
+
+        int dataColumnIndex = cursor
+                .getColumnIndex(MediaStore.Images.Media.DATA);
+
+        for (int i = startPosition; i < cursor.getCount(); i++) {
+
+            cursor.moveToPosition(i);
+
+            paths[i - startPosition] = cursor.getString(dataColumnIndex);
         }
+
+        return paths;
+    }
+
+    private void exitingCamera(Integer pos) {
+
+        Cursor cursor = loadCursor();
+        String[] paths = getImagePaths(cursor, image_count_before);
+        cursor.close();
+
+        if(paths != null) {
+            processNewImages(paths, pos);
+        }
+    }
+
+    private void processNewImages(String[] paths, Integer pos){
+        Sight activeSight = getActiveSight(pos);
+
+        for (String path : paths) {
+            File currFile = new File(path);
+            String newImageName = createImageFileName(activeSight);
+            File endFile = new File(newImageName);
+            moveFile(currFile, endFile);
+
+            Uri contentUri = Uri.fromFile(endFile);
+            Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE,contentUri);
+            sendBroadcast(mediaScanIntent);
+
+            Uri contentUri2 = Uri.fromFile(currFile);
+            Intent mediaScanIntent2 = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE,contentUri2);
+            sendBroadcast(mediaScanIntent2);
+        }
+    }
+
+    private void moveFile(File source, File target){
+        // your sd card
+        String sdCard = Environment.getExternalStorageDirectory().toString();
+
+        // the file to be moved or copied
+//        File sourceLocation = new File (sdCard + "/sample.txt");
+
+        // make sure your target location folder exists!
+//        File targetLocation = new File (sdCard + "/MyNewFolder/sample.txt");
+
+        // just to take note of the location sources
+        Log.w("Process", "sourceLocation: " + source);
+        Log.w("Process", "targetLocation: " + target);
+
+        try {
+
+            // 1 = move the file, 2 = copy the file
+            int actionChoice = 2;
+
+            switch(actionChoice)
+            {
+                case 1:
+                    if(source.renameTo(target)){
+                        Log.w("Process", "Move file successful.");
+                    }else{
+                        Log.w("Process", "Move file failed.");
+                    }
+                    break;
+                case 2:
+                    FileChannel inChannel = new FileInputStream(source).getChannel();
+                    FileChannel outChannel = new FileOutputStream(target).getChannel();
+
+                    inChannel.transferTo(0, inChannel.size(), outChannel);
+
+                    inChannel.close();
+                    outChannel.close();
+
+                    if(source.delete())
+                    {
+                        Log.w("Process", "Delete Succeeded");
+                    }
+                    else
+                    {
+                        Log.w("Process", "Delete Failed");
+                    }
+                    break;
+                default:
+                    break;
+            }
+
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private Sight getActiveSight(Integer position) {
+        Sight newImageSight = null;
+        if(mCurrentLocation != null)
+        {
+            if(position == null)
+            {
+                LatLng ll = new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude());
+                for (Sight s : SightDap.INSTANCE.getModel()) {
+                    if (PolyUtil.containsLocation(ll, s.getmSiteFencePoly(), false)) {
+                        newImageSight = s;
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                newImageSight = SightDap.INSTANCE.getModel().get(position);
+            }
+            if(newImageSight == null)
+            {
+                newImageSight = SightDap.INSTANCE.getModel().get(0);
+            }
+            String imageSight = newImageSight.getmSiteName();
+        }
+        else {
+            newImageSight = SightDap.INSTANCE.getModel().get(0);
+        }
+        return newImageSight;
     }
 
     protected synchronized void buildGoogleApiClient() {
@@ -220,7 +420,7 @@ public class MainActivity extends Activity implements
         Log.w("Setup", "Connection has failed");
     }
 
-    private File createImageFile(Sight s) {
+    private String createImageFileName(Sight s) {
         String fileName = s.getmSiteName();
         Date today = Calendar.getInstance().getTime();
 
@@ -247,43 +447,43 @@ public class MainActivity extends Activity implements
         File fileDir = new File(s.getmFolderPath());
         File fileOut = new File(fileDir, fileName);
 
-        return fileOut;
+        return fileOut.getAbsolutePath();
     }
 
-    private File prepForImageCapture(Integer position) throws IOException {
-        Sight newImageSight = null;
-        LatLng ll = null;
-        if(mCurrentLocation != null)
-        {
-            if(position == null)
-            {
-                ll = new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude());
-                for (Sight s : SightDap.INSTANCE.getModel()) {
-                    if (PolyUtil.containsLocation(ll, s.getmSiteFencePoly(), false)) {
-                        newImageSight = s;
-                        break;
-                    }
-                }
-            }
-            else
-            {
-                newImageSight = SightDap.INSTANCE.getModel().get(position);
-            }
-            if(newImageSight == null)
-            {
-                newImageSight = SightDap.INSTANCE.getModel().get(0);
-            }
-            String imageSight = newImageSight.getmSiteName();
-        }
-        else {
-            newImageSight = SightDap.INSTANCE.getModel().get(0);
-            String imageSight = newImageSight.getmSiteName();
-        }
-
-        File imageFile = createImageFile(newImageSight);
-        Log.w("Process", "New Image Filepath: " + imageFile.getAbsolutePath());
-        return imageFile;
-    }
+//    private File prepForImageCapture(Integer position) throws IOException {
+//        Sight newImageSight = null;
+//        LatLng ll = null;
+//        if(mCurrentLocation != null)
+//        {
+//            if(position == null)
+//            {
+//                ll = new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude());
+//                for (Sight s : SightDap.INSTANCE.getModel()) {
+//                    if (PolyUtil.containsLocation(ll, s.getmSiteFencePoly(), false)) {
+//                        newImageSight = s;
+//                        break;
+//                    }
+//                }
+//            }
+//            else
+//            {
+//                newImageSight = SightDap.INSTANCE.getModel().get(position);
+//            }
+//            if(newImageSight == null)
+//            {
+//                newImageSight = SightDap.INSTANCE.getModel().get(0);
+//            }
+//            String imageSight = newImageSight.getmSiteName();
+//        }
+//        else {
+//            newImageSight = SightDap.INSTANCE.getModel().get(0);
+//            String imageSight = newImageSight.getmSiteName();
+//        }
+//
+//        File imageFile = createImageFile(newImageSight);
+//        Log.w("Process", "New Image Filepath: " + imageFile.getAbsolutePath());
+//        return imageFile;
+//    }
 
     private void updateFileNums() {
         for(Sight s : SightDap.INSTANCE.getModel()) {
