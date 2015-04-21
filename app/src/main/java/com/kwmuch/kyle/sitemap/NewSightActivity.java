@@ -91,26 +91,27 @@ public class NewSightActivity extends FragmentActivity implements
 
         mSightName = (EditText) findViewById(R.id.sightName);
 
-        mSightName.setOnKeyListener(new View.OnKeyListener()
-        {
+        mSightName.setOnKeyListener(new View.OnKeyListener() {
             /**
              * This listens for the user to press the enter button on
              * the keyboard and then hides the virtual keyboard
              */
             public boolean onKey(View arg0, int arg1, KeyEvent event) {
                 // If the event is a key-down event on the "enter" button
-                if ( (event.getAction() == KeyEvent.ACTION_DOWN  ) &&
-                        (arg1           == KeyEvent.KEYCODE_ENTER)   )
-                {
-                    InputMethodManager imm = (InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);
+                if ((event.getAction() == KeyEvent.ACTION_DOWN) &&
+                        (arg1 == KeyEvent.KEYCODE_ENTER)) {
+                    InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
                     imm.hideSoftInputFromWindow(mSightName.getWindowToken(), 0);
                     return true;
                 }
                 return false;
             }
-        } );
+        });
 
-        mSightName.setText(mCurrentSight.getmSiteName());
+        if(!mCurrentSight.getmSiteName().equals("Sight Name"))
+        {
+            mSightName.setText(mCurrentSight.getmSiteName());
+        }
         mAddGeoFenceButton = (Button) findViewById(R.id.addGeoFence);
         geoFencePolygonPoints = (ArrayList<LatLng>) mCurrentSight.getmSiteFencePoly();
 //        geoFencePolygonPoints = new ArrayList<LatLng>();
