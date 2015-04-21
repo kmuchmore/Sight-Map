@@ -241,7 +241,7 @@ public class MainActivity extends Activity implements
             processNewImages(paths, pos);
         }
 
-        sendBroadcast(new Intent(Intent.ACTION_MEDIA_MOUNTED, Uri .parse("file://" + Environment.getExternalStorageDirectory())));
+//        sendBroadcast(new Intent(Intent.ACTION_MEDIA_MOUNTED, Uri.parse("file://" + Environment.getExternalStorageDirectory())));
     }
 
     private void processNewImages(String[] paths, Integer pos){
